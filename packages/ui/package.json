@@ -16,7 +16,7 @@
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
-    "ui-add": "pnpm dlx shadcn-ui add && prettier src --write --list-different"
+    "ui-add": "pnpm dlx shadcn add && prettier src --write --list-different"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
@@ -28,6 +28,7 @@
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-popover": "^1.1.0",
+    "@radix-ui/react-progress": "^1.1.2",
     "@radix-ui/react-radio-group": "^1.2.0",
     "@radix-ui/react-scroll-area": "^1.1.0",
     "@radix-ui/react-select": "^2.1.0",

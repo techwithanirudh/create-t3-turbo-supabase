@@ -15,11 +15,11 @@ export default function Features() {
               Key Features
             </div>
             <h2 className="text-3xl font-bold tracking-tighter text-gray-900 dark:text-gray-50 sm:text-5xl">
-              Essential tools for effortless note sharing
+              Comprehensive Enterprise Solutions
             </h2>
             <p className="max-w-[900px] text-gray-600 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Posts Buddy provides all the features you need to upload,
-              organize, and share your class notes seamlessly.
+              Our integrated platform delivers essential tools to optimize your company's operations
+              and collaboration workflows.
             </p>
           </div>
         </div>
@@ -27,60 +27,60 @@ export default function Features() {
           <Card className="grid gap-1">
             <CardHeader>
               <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">
-                Instant Uploads
+                Customer Relationship Management
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Quickly upload your notes to the cloud with just a few clicks.
+                Centralized customer data, interaction tracking, and sales pipeline management.
               </p>
             </CardHeader>
           </Card>
           <Card className="grid gap-1">
             <CardHeader>
               <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">
-                Cross-Device Sync
+                Secure File Storage
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Access and sync your notes seamlessly across all your devices.
+                Enterprise-grade storage with encryption, access controls, and unlimited capacity.
               </p>
             </CardHeader>
           </Card>
           <Card className="grid gap-1">
             <CardHeader>
               <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">
-                Secure Sharing
+                Team Messaging
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Share your notes securely with classmates and friends.
+                Real-time communication with channels, direct messages, and video conferencing.
               </p>
             </CardHeader>
           </Card>
           <Card className="grid gap-1">
             <CardHeader>
               <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">
-                Free Forever
+                Document Management
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Enjoy all the features of Posts Buddy at no cost.
+                Comprehensive document workflows with version control and approval processes.
               </p>
             </CardHeader>
           </Card>
           <Card className="grid gap-1">
             <CardHeader>
               <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">
-                Offline Access
+                AI-Powered Chatbot
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Access your notes even without an internet connection.
+                Intelligent virtual assistant to automate tasks and provide instant support.
               </p>
             </CardHeader>
           </Card>
           <Card className="grid gap-1">
             <CardHeader>
               <h3 className="text-lg font-bold text-gray-900 dark:text-gray-50">
-                Organizational Tools
+                Advanced Analytics
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Use tags and folders to keep your notes well-organized.
+                Data-driven insights and customizable reports for informed decision-making.
               </p>
             </CardHeader>
           </Card>
@@ -88,10 +88,9 @@ export default function Features() {
         <div className="flex flex-row items-start justify-between gap-4 md:justify-center">
           <Link
             href="/auth/signin"
-            // default todo update shadn
             className={buttonVariants({ variant: "default" })}
           >
-            Get Started
+            Schedule Demo
           </Link>
           <Link
             className={buttonVariants({ variant: "outline" })}

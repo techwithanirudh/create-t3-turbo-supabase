@@ -2,14 +2,11 @@
 
 import * as React from "react";
 import Link from "next/link";
-import type { UserResponse } from "@supabase/supabase-js";
+import type { UserResponse, User } from "@supabase/supabase-js";
 import {
-  Flag,
-  Home,
   NotebookTextIcon,
-  PanelLeft,
   Search,
-  Trash2,
+  Menu,
 } from "lucide-react";
 
 import { cn } from "@acme/ui";
@@ -31,44 +28,39 @@ import {
 import { Separator } from "@acme/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@acme/ui/sheet";
 import { TooltipProvider } from "@acme/ui/tooltip";
+import { Avatar, AvatarImage, AvatarFallback } from "@acme/ui/avatar";
+import { ScrollArea } from "@acme/ui/scroll-area";
 
 import { Logo } from "~/app/dashboard/_components/layout/logo";
-import type { NavProps } from "~/app/dashboard/_components/layout/nav";
 import { Nav } from "~/app/dashboard/_components/layout/nav";
 import UserAvatar from "../user-avatar";
 import { ThemeToggle } from "@acme/ui/theme";
+import { usePathname } from "next/navigation";
+import { mainNavItems } from "~/app/dashboard/config/nav";
+
+interface UserMetadata {
+  avatar_url?: string;
+  full_name?: string;
+}
 
 interface LayoutProps {
   children: React.ReactNode;
-  user: UserResponse;
+  user: UserResponse & { data: { user: User & { user_metadata: UserMetadata } | null } };
   defaultLayout: number[] | undefined;
   defaultCollapsed?: boolean;
   navCollapsedSize: number;
 }
 
-const NAV_LINKS: NavProps["links"] = [
-  {
-    title: "Home",
-    label: "",
-    href: "/dashboard",
-    icon: Home,
-    variant: "default",
-  },
-  {
-    title: "Trash",
-    label: "",
-    href: "/dashboard",
-    icon: Trash2,
-    variant: "ghost",
-  },
-  {
-    title: "Reported",
-    label: "",
-    href: "/dashboard",
-    icon: Flag,
-    variant: "ghost",
-  },
-];
+function getBreadcrumbs(pathname: string) {
+  const paths = pathname.split('/').filter(Boolean);
+  const breadcrumbs = paths.map((path, index) => {
+    const href = `/${paths.slice(0, index + 1).join('/')}`;
+    const title = mainNavItems.find(link => link.href === href)?.title ??
+      path.charAt(0).toUpperCase() + path.slice(1);
+    return { href, title };
+  });
+  return breadcrumbs;
+}
 
 export function Layout({
   children,
@@ -78,6 +70,8 @@ export function Layout({
   navCollapsedSize,
 }: LayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
+  const pathname = usePathname();
+  const breadcrumbs = getBreadcrumbs(pathname);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -107,7 +101,7 @@ export function Layout({
           className={cn(
             "hidden sm:block",
             isCollapsed &&
-              "min-w-[50px] transition-all duration-300 ease-in-out",
+            "min-w-[50px] transition-all duration-300 ease-in-out",
           )}
         >
           <div
@@ -119,75 +113,125 @@ export function Layout({
             <Logo isCollapsed={isCollapsed} />
           </div>
           <Separator />
-          <Nav isCollapsed={isCollapsed} links={NAV_LINKS} />
+          <Nav isCollapsed={isCollapsed} links={mainNavItems} />
         </ResizablePanel>
         <ResizableHandle withHandle className="hidden sm:flex" />
         <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
           <div className="flex h-full flex-col">
             <header
               className={cn(
-                "sticky top-0 z-30 flex h-[52px] items-center gap-4 px-4 sm:static sm:border-0 sm:bg-transparent sm:px-6",
+                "sticky top-0 z-30 flex h-[52px] items-center justify-between gap-4 border-b bg-background px-4 sm:static sm:px-6",
               )}
             >
-              <Sheet>
-                <SheetTrigger asChild>
-                  <Button size="icon" variant="outline" className="sm:hidden">
-                    <PanelLeft className="h-5 w-5" />
-                    <span className="sr-only">Toggle Menu</span>
-                  </Button>
-                </SheetTrigger>
-                {/* todo: make this and nav a combined list to loop through */}
-                <SheetContent side="left" className="sm:max-w-xs">
-                  <nav className="grid gap-1 text-lg font-medium">
-                    <div className="flex justify-between items-center my-2">
-                      <Link
-                        href="/dashboard"
-                        className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
-                      >
-                        <NotebookTextIcon className="h-5 w-5 transition-all group-hover:scale-110" />
-                        <span className="sr-only">Notes Buddy</span>
-                      </Link>
-                      <ThemeToggle />
-                    </div>
-                    <div className="-ml-2">
-                      <Nav isCollapsed={false} links={NAV_LINKS} />
-                    </div>
-                  </nav>
-                </SheetContent>
-              </Sheet>
               <Breadcrumb className="hidden md:flex">
                 <BreadcrumbList>
-                  <BreadcrumbItem>
-                    <BreadcrumbLink asChild>
-                      <Link href="#">Dashboard</Link>
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbLink asChild>
-                      <Link href="#">Orders</Link>
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage>Recent Orders</BreadcrumbPage>
-                  </BreadcrumbItem>
+                  {breadcrumbs.map((crumb, index) => (
+                    <React.Fragment key={crumb.href}>
+                      <BreadcrumbItem>
+                        {index === breadcrumbs.length - 1 ? (
+                          <BreadcrumbPage>{crumb.title}</BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink asChild>
+                            <Link href={crumb.href}>{crumb.title}</Link>
+                          </BreadcrumbLink>
+                        )}
+                      </BreadcrumbItem>
+                      {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+                    </React.Fragment>
+                  ))}
                 </BreadcrumbList>
               </Breadcrumb>
-              <div className="relative ml-auto flex-1 md:grow-0">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[320px]"
-                />
-              </div>
 
-              <UserAvatar user={user} />
+              <div className="flex items-center gap-4">
+                <div className="relative hidden md:block">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search..."
+                    className="w-[200px] pl-8 lg:w-[300px]"
+                  />
+                </div>
+
+                <UserAvatar user={user} />
+
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button size="icon" variant="outline" className="sm:hidden">
+                      <Menu className="h-5 w-5" />
+                      <span className="sr-only">Toggle Menu</span>
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-[300px] p-0">
+                    <div className="flex h-14 items-center border-b px-4">
+                      <Link
+                        href="/dashboard"
+                        className="flex items-center gap-2 font-semibold"
+                      >
+                        <NotebookTextIcon className="h-6 w-6" />
+                        <span>Enterprise Suite</span>
+                      </Link>
+                    </div>
+                    <ScrollArea className="h-[calc(100vh-56px)]">
+                      <div className="p-4">
+                        <div className="mb-4">
+                          <Input
+                            type="search"
+                            placeholder="Search..."
+                            className="w-full"
+                          />
+                        </div>
+                        <nav className="grid gap-2">
+                          {mainNavItems.map((link) => {
+                            const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                            return (
+                              <Link
+                                key={link.href}
+                                href={link.href ?? '#'}
+                                className={cn(
+                                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                                  isActive
+                                    ? "bg-muted text-primary"
+                                    : "hover:bg-muted text-muted-foreground hover:text-primary"
+                                )}
+                              >
+                                {link.icon && <link.icon className="h-5 w-5" />}
+                                <span>{link.title}</span>
+                              </Link>
+                            );
+                          })}
+                        </nav>
+                        <Separator className="my-4" />
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-8 w-8 border">
+                              <AvatarImage
+                                src={user.data.user?.user_metadata.avatar_url}
+                                alt={user.data.user?.email ?? ""}
+                              />
+                              <AvatarFallback>
+                                {user.data.user?.email?.[0]?.toUpperCase() ?? "U"}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="grid gap-0.5 text-xs">
+                              <span className="font-medium">
+                                {user.data.user?.user_metadata.full_name ??
+                                  user.data.user?.email ??
+                                  "User"}
+                              </span>
+                              <span className="text-muted-foreground">
+                                {user.data.user?.email}
+                              </span>
+                            </div>
+                          </div>
+                          <ThemeToggle />
+                        </div>
+                      </div>
+                    </ScrollArea>
+                  </SheetContent>
+                </Sheet>
+              </div>
             </header>
-            <Separator />
-            {/* 54px is the height of the header */}
-            <main className="max-h-[calc(100vh-54px)] flex-1 overflow-auto bg-muted/30">
+            <main className="flex-1 overflow-auto bg-muted/30">
               {children}
             </main>
           </div>

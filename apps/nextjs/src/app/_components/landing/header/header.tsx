@@ -1,9 +1,8 @@
-
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { MenuIcon, NotebookTextIcon, XIcon } from 'lucide-react';
+import { MenuIcon, BuildingIcon, XIcon } from 'lucide-react';
 import { ThemeToggle } from "@acme/ui/theme";
 
 function Header() {
@@ -56,9 +55,9 @@ function Header() {
     <header className="fixed inset-x-0 top-0 z-10 bg-background/80 backdrop-blur-lg">
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
         <div className="flex w-full justify-between">
-          <Link href="/" className="flex items-center justify-center">
-            <NotebookTextIcon className="h-6 w-6" />
-            <span className="sr-only">Posts Buddy</span>
+          <Link href="/" className="flex items-center justify-center gap-2">
+            <BuildingIcon className="h-6 w-6" />
+            <span className="font-semibold">Enterprise Suite</span>
           </Link>
 
           <button className="md:hidden" onClick={toggleMenu}>
@@ -71,12 +70,6 @@ function Header() {
           </button>
           <div className="hidden md:flex md:w-auto md:items-center">
             <nav className="flex gap-4 lg:gap-6">
-              {/* <Link
-                className="flex items-center text-sm font-medium underline-offset-4 hover:underline"
-                href="/about"
-              >
-                About
-              </Link> */}
               <Link
                 className="flex items-center text-sm font-medium underline-offset-4 hover:underline"
                 href="#features"
@@ -85,9 +78,21 @@ function Header() {
               </Link>
               <Link
                 className="flex items-center text-sm font-medium underline-offset-4 hover:underline"
+                href="#pricing"
+              >
+                Pricing
+              </Link>
+              <Link
+                className="flex items-center text-sm font-medium underline-offset-4 hover:underline"
                 href="#faq"
               >
                 FAQ
+              </Link>
+              <Link
+                className="flex items-center text-sm font-medium underline-offset-4 hover:underline"
+                href="/contact"
+              >
+                Contact
               </Link>
               <ThemeToggle />
             </nav>
@@ -101,13 +106,6 @@ function Header() {
         className="bg-transparent md:hidden"
       >
         <div className="flex flex-col gap-4 p-4">
-          {/* <Link
-            className="flex items-center text-sm font-medium underline-offset-4 hover:underline"
-            href="/about"
-            onClick={toggleMenu}
-          >
-            About
-          </Link> */}
           <Link
             className="flex items-center text-sm font-medium underline-offset-4 hover:underline"
             href="#features"
@@ -117,13 +115,27 @@ function Header() {
           </Link>
           <Link
             className="flex items-center text-sm font-medium underline-offset-4 hover:underline"
+            href="#pricing"
+            onClick={toggleMenu}
+          >
+            Pricing
+          </Link>
+          <Link
+            className="flex items-center text-sm font-medium underline-offset-4 hover:underline"
             href="#faq"
             onClick={toggleMenu}
           >
             FAQ
           </Link>
+          <Link
+            className="flex items-center text-sm font-medium underline-offset-4 hover:underline"
+            href="/contact"
+            onClick={toggleMenu}
+          >
+            Contact
+          </Link>
           <div className="flex w-full items-center justify-end">
-            <ThemeToggle  />
+            <ThemeToggle />
           </div>
         </div>
       </motion.div>

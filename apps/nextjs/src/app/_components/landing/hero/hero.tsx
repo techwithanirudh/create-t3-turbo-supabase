@@ -16,13 +16,12 @@ export default function Hero() {
         <div className="mx-auto grid max-w-[1300px] gap-4 px-4 md:grid-cols-2 md:gap-16">
           <div>
             <h1 className="lg:leading-tighter text-3xl font-bold tracking-tighter text-gray-900 dark:text-gray-50 sm:text-4xl md:text-5xl xl:text-[3.4rem] 2xl:text-[3.75rem]">
-              Effortlessly Share Your Class Notes
+              All-in-One Enterprise Solution
             </h1>
           </div>
           <div className="flex flex-col items-start space-y-4">
             <p className="mx-auto max-w-[700px] text-gray-600 dark:text-gray-400 md:text-xl">
-              Posts Buddy makes it easy to upload and share your class notes
-              instantly across all your devices.
+              Streamline your company operations with our unified platform for CRM, storage, messaging, document management, and AI assistance.
             </p>
             <div className="space-x-4">
               <Button asChild>
@@ -35,7 +34,7 @@ export default function Hero() {
           </div>
         </div>
         <Image
-          alt="Hero"
+          alt="Enterprise Dashboard"
           className="mx-auto rounded-t-xl object-cover"
           height="300"
           src="/images/hero.jpg"

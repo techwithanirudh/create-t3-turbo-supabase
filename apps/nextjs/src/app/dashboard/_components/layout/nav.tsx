@@ -1,8 +1,6 @@
-
 "use client"
 
 import Link from "next/link"
-import type { LucideIcon } from "lucide-react"
 
 import { cn } from "@acme/ui"
 import { buttonVariants } from "@acme/ui/button"
@@ -11,16 +9,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@acme/ui/tooltip"
+import type { NavItem } from "~/app/dashboard/config/nav"
 
 export interface NavProps {
   isCollapsed: boolean
-  links: {
-    title: string
-    href: string;
-    label?: string
-    icon: LucideIcon
-    variant: "default" | "ghost"
-  }[]
+  links: NavItem[]
 }
 
 export function Nav({ links, isCollapsed }: NavProps) {
@@ -35,15 +28,15 @@ export function Nav({ links, isCollapsed }: NavProps) {
             <Tooltip key={index} delayDuration={0}>
               <TooltipTrigger asChild>
                 <Link
-                  href={link.href}
+                  href={link.href ?? '#'}
                   className={cn(
                     buttonVariants({ variant: link.variant, size: "icon" }),
                     "h-9 w-9",
                     link.variant === "default" &&
-                      "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
+                    "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
                   )}
                 >
-                  <link.icon className="h-4 w-4" />
+                  {link.icon && <link.icon className="h-4 w-4" />}
                   <span className="sr-only">{link.title}</span>
                 </Link>
               </TooltipTrigger>
@@ -59,22 +52,22 @@ export function Nav({ links, isCollapsed }: NavProps) {
           ) : (
             <Link
               key={index}
-              href={link.href}
+              href={link.href ?? '#'}
               className={cn(
                 buttonVariants({ variant: link.variant, size: "sm" }),
                 link.variant === "default" &&
-                  "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
+                "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
                 "justify-start"
               )}
             >
-              <link.icon className="mr-2 h-4 w-4" />
+              {link.icon && <link.icon className="mr-2 h-4 w-4" />}
               {link.title}
               {link.label && (
                 <span
                   className={cn(
                     "ml-auto",
                     link.variant === "default" &&
-                      "text-background dark:text-white"
+                    "text-background dark:text-white"
                   )}
                 >
                   {link.label}

@@ -20,8 +20,7 @@ export default function FAQ() {
               Frequently Asked Questions
             </h2>
             <p className="text-gray-600 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Get answers to the most common questions about our website
-              builder.
+              Common questions about our enterprise platform
             </p>
           </div>
         </div>
@@ -29,36 +28,35 @@ export default function FAQ() {
           <Accordion collapsible type="single">
             <AccordionItem value="question1">
               <AccordionTrigger className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                What features are included in Posts Buddy?
+                What features are included in the platform?
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Posts Buddy includes a variety of features to enhance your
-                  note-sharing experience, such as instant uploads, cross-device
-                  sync, secure sharing, and organizational tools. It's free to
-                  use forever.
+                  Our platform includes comprehensive CRM tools, secure file storage and sharing,
+                  team messaging and collaboration, advanced document/PDF management with version control,
+                  and an AI-powered chatbot to streamline internal processes.
                 </p>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="question2">
               <AccordionTrigger className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                How much does Posts Buddy cost?
+                How is data security handled?
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Posts Buddy is free to use. There are no hidden costs or
-                  premium plans. All features are available to every user at no
-                  cost.
+                  We implement enterprise-grade security with end-to-end encryption, role-based access controls,
+                  regular security audits, and compliance with industry standards including GDPR, HIPAA, and SOC 2.
                 </p>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="question3">
               <AccordionTrigger className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                Is my data secure with Posts Buddy?
+                Can the platform be customized for our company needs?
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Yes, Your data privacy is our top priority.
+                  Yes, our platform is highly customizable. We offer white-labeling options, custom workflows,
+                  API integrations with your existing tools, and dedicated support for enterprise-specific requirements.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -66,37 +64,35 @@ export default function FAQ() {
           <Accordion collapsible type="single">
             <AccordionItem value="question4">
               <AccordionTrigger className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                Can I access my notes offline?
+                How does the document management system work?
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Yes, Posts Buddy allows you to download your notes for offline
-                  access. This feature ensures you can view your notes even
-                  without an internet connection.
+                  Our document management system provides version history tracking, automated OCR for searchable PDFs,
+                  collaborative editing, approval workflows, and secure sharing with fine-grained permissions.
                 </p>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="question5">
               <AccordionTrigger className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                How do I share my notes with others?
+                What kind of support is provided?
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  You can easily share your notes by generating a shareable link
-                  or by directly sharing them with other Posts Buddy users.
-                  Sharing settings allow you to control who can view or edit
-                  your notes.
+                  Enterprise clients receive 24/7 priority support, a dedicated account manager,
+                  regular training sessions, implementation assistance, and access to our knowledge base
+                  with best practices and configuration guides.
                 </p>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="question6">
               <AccordionTrigger className="text-lg font-semibold text-gray-900 dark:text-gray-50">
-                What platforms does Posts Buddy support?
+                Is the platform accessible on mobile devices?
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Posts Buddy is currently compatible with web devices only.
-                  Mobile support is coming soon, so stay tuned for updates!
+                  Yes, our platform is fully responsive and works across all devices. We also offer dedicated
+                  mobile apps for iOS and Android with offline capabilities and secure push notifications.
                 </p>
               </AccordionContent>
             </AccordionItem>
