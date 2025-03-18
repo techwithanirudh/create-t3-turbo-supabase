@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 
 import { Button } from '@acme/ui/button';
@@ -29,27 +28,21 @@ export default function UserAvatar({ user }: UserAvatarProps) {
   const session = user.data;
 
   async function handleSignOut() {
-    const res = await signOut();
-
-    // const title =
-    //   typeof res?.message === 'string' && res?.message != ''
-    //     ? res.message
-    //     : 'Oops! Something went wrong. Please try again later.';
-    // toast(title);
-    // if (res?.success && res?.redirect && typeof res.redirect === 'string')
-    //   redirect(res?.redirect);
+    await signOut();
   }
 
-  // yes, this is from stackoverflow...
   function getInitials(name: string) {
     const names = name.split(' ');
-    const initials = names.map(x => x.charAt(0).toUpperCase())
+    const initials = names.map(x => x.charAt(0).toUpperCase());
     if (initials.length > 1) {
       return `${initials[0]}${initials[initials.length - 1]}`;
-    } else {
-      return initials[0];
     }
+    return initials[0];
   }
+
+  const userFullName = (session.user.user_metadata.full_name as string | undefined) ?? 'User';
+  const userAvatarUrl = (session.user.user_metadata.avatar_url as string | undefined) ?? '';
+  const userEmail = session.user.email ?? 'user@example.com';
 
   return (
     <DropdownMenu>
@@ -60,10 +53,8 @@ export default function UserAvatar({ user }: UserAvatarProps) {
           className="relative h-10 w-10 rounded-full"
         >
           <Avatar className="h-10 w-10">
-            {/* @username > image */}
-            <AvatarImage src={session.user.user_metadata.avatar_url ?? ''} alt="User Avatar" />
-            {/* dynamic generation */}
-            <AvatarFallback>{getInitials(session.user.user_metadata.full_name ?? 'User')}</AvatarFallback>
+            <AvatarImage src={userAvatarUrl} alt="User Avatar" />
+            <AvatarFallback>{getInitials(userFullName)}</AvatarFallback>
           </Avatar>
           <span className="sr-only">Profile options</span>
         </Button>
@@ -72,10 +63,10 @@ export default function UserAvatar({ user }: UserAvatarProps) {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {session.user.user_metadata.full_name ?? 'User'}
+              {userFullName}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {session.user.email ?? 'user@example.com'}
+              {userEmail}
             </p>
           </div>
         </DropdownMenuLabel>

@@ -13,19 +13,10 @@ import {
 } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@acme/ui/card";
 import { Input } from "@acme/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@acme/ui/tabs";
 import { ScrollArea } from "@acme/ui/scroll-area";
-import { Separator } from "@acme/ui/separator";
 
 export default function MessagingPage() {
     return (
@@ -77,8 +68,8 @@ export default function MessagingPage() {
                                 <div
                                     key={conversation.id}
                                     className={`flex cursor-pointer items-center gap-3 rounded-md p-3 ${conversation.id === "1"
-                                            ? "bg-muted"
-                                            : "hover:bg-muted/50"
+                                        ? "bg-muted"
+                                        : "hover:bg-muted/50"
                                         }`}
                                 >
                                     <Avatar>
@@ -177,8 +168,8 @@ export default function MessagingPage() {
                                         </div>
                                         <div
                                             className={`max-w-md rounded-lg px-4 py-2 ${message.sender === "me"
-                                                    ? "bg-primary text-primary-foreground"
-                                                    : "bg-muted"
+                                                ? "bg-primary text-primary-foreground"
+                                                : "bg-muted"
                                                 }`}
                                         >
                                             <p className="text-sm">{message.content}</p>

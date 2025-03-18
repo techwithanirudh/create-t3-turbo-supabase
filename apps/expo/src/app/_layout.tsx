@@ -56,7 +56,12 @@ export default function RootLayout() {
       const theme = await AsyncStorage.getItem("theme");
       if (Platform.OS === "web") {
         // Adds the background color to the html element to prevent white background on overscroll.
-        document.documentElement.classList.add("bg-background");
+        // @ts-expect-error -- React Native Web-specific code
+        if (typeof (document as unknown as Document) !== "undefined") {
+          // @ts-expect-error -- React Native Web-specific code
+          const documentElement = (document as unknown as Document).documentElement as { classList: { add: (cls: string) => void } };
+          documentElement.classList.add("bg-background");
+        }
       }
       if (!theme) {
         setAndroidNavigationBar(colorScheme);
@@ -76,7 +81,7 @@ export default function RootLayout() {
     })().finally(() => {
       SplashScreen.hideAsync();
     });
-  }, []);
+  }, [colorScheme, setColorScheme]);
 
   if (!isColorSchemeLoaded) {
     return null;

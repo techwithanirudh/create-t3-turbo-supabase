@@ -16,8 +16,8 @@ export const signInWithPassword = action(
     const supabase = createClient();
 
     const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+      email: email as string,
+      password: password as string,
     });
 
     if (error) throw error;
@@ -34,8 +34,8 @@ export const signUp = action(SignUpSchema, async ({ email, password }) => {
   const redirectUrl = `${origin}/auth/confirm?next=${encodeURIComponent(DEFAULT_LOGIN_REDIRECT)}`;
 
   const { error, data } = await supabase.auth.signUp({
-    email,
-    password,
+    email: email as string,
+    password: password as string,
     options: {
       emailRedirectTo: redirectUrl,
     },
@@ -52,21 +52,24 @@ export const signUp = action(SignUpSchema, async ({ email, password }) => {
 
 export const signInWithGithub = async () => {
   const origin = headers().get("origin");
-  const supabase = createClient();
+  if (!origin) throw new Error("Origin header not found");
 
+  const supabase = createClient();
   const redirectUrl = `${origin}/auth/callback?next=${encodeURIComponent(DEFAULT_LOGIN_REDIRECT)}`;
 
-  const res = await supabase.auth.signInWithOAuth({
+  const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "github",
     options: { redirectTo: redirectUrl },
   });
 
-  if (res.data.url) redirect(res.data.url);
-  throw res.error;
+  if (error) throw error;
+  if (data.url) redirect(data.url);
+  throw new Error("No URL returned from OAuth provider");
 };
 
 export const signOut = async () => {
   const supabase = createClient();
-  await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
+  if (error) throw error;
   redirect("/");
 };

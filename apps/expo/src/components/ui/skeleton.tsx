@@ -21,7 +21,7 @@ function Skeleton({
       withSequence(withTiming(0.5, { duration }), withTiming(1, { duration })),
       -1
     );
-  }, []);
+  }, [sv]);
 
   const style = useAnimatedStyle(() => ({
     opacity: sv.value,

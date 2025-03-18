@@ -1,4 +1,4 @@
-import type {Metadata} from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { NotebookTextIcon } from "lucide-react";
 
@@ -20,7 +20,7 @@ export default async function SignInPage() {
   const supabase = createClient();
   const user = await supabase.auth.getUser();
 
-  if (!user.error ?? user.data.user) redirect('/dashboard')
+  if (user.data.user) redirect('/dashboard')
 
   return (
     <>
