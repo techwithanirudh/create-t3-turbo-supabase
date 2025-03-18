@@ -13,8 +13,8 @@ import {
   FormItem,
   FormMessage,
 } from "@acme/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { Input } from "@acme/ui/input";
 import { toast } from "sonner";
 
@@ -60,7 +60,12 @@ export function CreatePostForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input {...field} placeholder="Title" className="bg-background" required />
+                <Input
+                  {...field}
+                  placeholder="Title"
+                  className="bg-background"
+                  required
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -72,7 +77,12 @@ export function CreatePostForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input {...field} placeholder="Content"  className="bg-background" required />
+                <Input
+                  {...field}
+                  placeholder="Content"
+                  className="bg-background"
+                  required
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -142,10 +152,7 @@ export function PostCard(props: {
         <p className="mt-2 text-sm">{post.content}</p>
       </div>
       <div>
-        <Button
-          size="icon"
-          onClick={() => deletePost.mutate(props.post.id)}
-        >
+        <Button size="icon" onClick={() => deletePost.mutate(props.post.id)}>
           <TrashIcon className="w-4 h-4" />
         </Button>
       </div>

@@ -11,8 +11,8 @@ import {
   FormItem,
   FormMessage,
 } from "@acme/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { Input } from "@acme/ui/input";
 import { SignUpSchema } from "@acme/validators";
 
@@ -90,7 +90,9 @@ export const SignUpForm = () => {
           type="submit"
           className="w-full"
         >
-          {status === "executing" && <LoaderCircleIcon className="mr-2 h-4 w-4 animate-spin" />}
+          {status === "executing" && (
+            <LoaderCircleIcon className="mr-2 h-4 w-4 animate-spin" />
+          )}
           Continue with Email
         </Button>
       </form>

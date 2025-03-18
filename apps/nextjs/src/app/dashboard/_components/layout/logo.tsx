@@ -31,11 +31,7 @@ export function Logo({ isCollapsed }: LogoProps) {
     >
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            className={cn("h-8 w-8 group")}
-          >
+          <Button variant="outline" size="icon" className={cn("h-8 w-8 group")}>
             <NotebookTextIcon className="size-5 scale-100 transition-all group-hover:scale-110" />
           </Button>
         </DropdownMenuTrigger>

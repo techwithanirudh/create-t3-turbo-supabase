@@ -1,7 +1,7 @@
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 
 export default function SettingsProfilePage() {
-  redirect('/dashboard/settings/profile');
+  redirect("/dashboard/settings/profile");
 
   return (
     <div className="space-y-6">

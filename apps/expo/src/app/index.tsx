@@ -133,7 +133,6 @@ function CreatePost() {
   );
 }
 
-
 export default function HomeScreen() {
   const utils = api.useUtils();
 
@@ -148,7 +147,7 @@ export default function HomeScreen() {
         >
           <Text className="font-semibold text-foreground">Refresh posts</Text>
         </Button>
-        
+
         <FlashList
           data={postQuery.data}
           estimatedItemSize={20}

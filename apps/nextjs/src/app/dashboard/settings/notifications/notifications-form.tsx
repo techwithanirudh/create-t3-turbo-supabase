@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import Link from "next/link";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { Button } from '@acme/ui/button';
-import { Checkbox } from '@acme/ui/checkbox';
+import { Button } from "@acme/ui/button";
+import { Checkbox } from "@acme/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -14,21 +14,21 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '@acme/ui/form';
-import { RadioGroup, RadioGroupItem } from '@acme/ui/radio-group';
-import { Switch } from '@acme/ui/switch';
-import { toast } from 'sonner';
+  FormMessage,
+} from "@acme/ui/form";
+import { RadioGroup, RadioGroupItem } from "@acme/ui/radio-group";
+import { Switch } from "@acme/ui/switch";
+import { toast } from "sonner";
 
 const notificationsFormSchema = z.object({
-  type: z.enum(['all', 'mentions', 'none'], {
-    required_error: 'You need to select a notification type.'
+  type: z.enum(["all", "mentions", "none"], {
+    required_error: "You need to select a notification type.",
   }),
   mobile: z.boolean().default(false).optional(),
   communication_emails: z.boolean().default(false).optional(),
   social_emails: z.boolean().default(false).optional(),
   marketing_emails: z.boolean().default(false).optional(),
-  security_emails: z.boolean()
+  security_emails: z.boolean(),
 });
 
 type NotificationsFormValues = z.infer<typeof notificationsFormSchema>;
@@ -38,22 +38,22 @@ const defaultValues: Partial<NotificationsFormValues> = {
   communication_emails: false,
   marketing_emails: false,
   social_emails: true,
-  security_emails: true
+  security_emails: true,
 };
 
 export function NotificationsForm() {
   const form = useForm<NotificationsFormValues>({
     resolver: zodResolver(notificationsFormSchema),
-    defaultValues
+    defaultValues,
   });
 
   function onSubmit(data: NotificationsFormValues) {
-    toast('You submitted the following values:', {
+    toast("You submitted the following values:", {
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(data, null, 2)}</code>
         </pre>
-      )
+      ),
     });
   }
 
@@ -207,7 +207,7 @@ export function NotificationsForm() {
                   Use different settings for my mobile devices
                 </FormLabel>
                 <FormDescription>
-                  You can manage your mobile notifications in the{' '}
+                  You can manage your mobile notifications in the{" "}
                   <Link href="/dashboard/settings">mobile settings</Link> page.
                 </FormDescription>
               </div>

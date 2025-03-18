@@ -3,11 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import type { UserResponse, User } from "@supabase/supabase-js";
-import {
-  NotebookTextIcon,
-  Search,
-  Menu,
-} from "lucide-react";
+import { NotebookTextIcon, Search, Menu } from "lucide-react";
 
 import { cn } from "@acme/ui";
 import {
@@ -45,17 +41,20 @@ interface UserMetadata {
 
 interface LayoutProps {
   children: React.ReactNode;
-  user: UserResponse & { data: { user: User & { user_metadata: UserMetadata } | null } };
+  user: UserResponse & {
+    data: { user: (User & { user_metadata: UserMetadata }) | null };
+  };
   defaultLayout: number[] | undefined;
   defaultCollapsed?: boolean;
   navCollapsedSize: number;
 }
 
 function getBreadcrumbs(pathname: string) {
-  const paths = pathname.split('/').filter(Boolean);
+  const paths = pathname.split("/").filter(Boolean);
   const breadcrumbs = paths.map((path, index) => {
-    const href = `/${paths.slice(0, index + 1).join('/')}`;
-    const title = mainNavItems.find(link => link.href === href)?.title ??
+    const href = `/${paths.slice(0, index + 1).join("/")}`;
+    const title =
+      mainNavItems.find((link) => link.href === href)?.title ??
       path.charAt(0).toUpperCase() + path.slice(1);
     return { href, title };
   });
@@ -101,7 +100,7 @@ export function Layout({
           className={cn(
             "hidden sm:block",
             isCollapsed &&
-            "min-w-[50px] transition-all duration-300 ease-in-out",
+              "min-w-[50px] transition-all duration-300 ease-in-out",
           )}
         >
           <div
@@ -136,7 +135,9 @@ export function Layout({
                           </BreadcrumbLink>
                         )}
                       </BreadcrumbItem>
-                      {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+                      {index < breadcrumbs.length - 1 && (
+                        <BreadcrumbSeparator />
+                      )}
                     </React.Fragment>
                   ))}
                 </BreadcrumbList>
@@ -182,16 +183,18 @@ export function Layout({
                         </div>
                         <nav className="grid gap-2">
                           {mainNavItems.map((link) => {
-                            const isActive = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                            const isActive =
+                              pathname === link.href ||
+                              pathname.startsWith(`${link.href}/`);
                             return (
                               <Link
                                 key={link.href}
-                                href={link.href ?? '#'}
+                                href={link.href ?? "#"}
                                 className={cn(
                                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                                   isActive
                                     ? "bg-muted text-primary"
-                                    : "hover:bg-muted text-muted-foreground hover:text-primary"
+                                    : "hover:bg-muted text-muted-foreground hover:text-primary",
                                 )}
                               >
                                 {link.icon && <link.icon className="h-5 w-5" />}
@@ -209,7 +212,8 @@ export function Layout({
                                 alt={user.data.user?.email ?? ""}
                               />
                               <AvatarFallback>
-                                {user.data.user?.email?.[0]?.toUpperCase() ?? "U"}
+                                {user.data.user?.email?.[0]?.toUpperCase() ??
+                                  "U"}
                               </AvatarFallback>
                             </Avatar>
                             <div className="grid gap-0.5 text-xs">
@@ -231,9 +235,7 @@ export function Layout({
                 </Sheet>
               </div>
             </header>
-            <main className="flex-1 overflow-auto bg-muted/30">
-              {children}
-            </main>
+            <main className="flex-1 overflow-auto bg-muted/30">{children}</main>
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>

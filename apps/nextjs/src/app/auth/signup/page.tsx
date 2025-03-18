@@ -1,4 +1,4 @@
-import type {Metadata} from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { NotebookTextIcon } from "lucide-react";
 
@@ -8,10 +8,9 @@ import { buttonVariants } from "@acme/ui/button";
 import { CardWrapper } from "~/app/auth/_components/card-wrapper";
 import { SignUpForm } from "~/app/auth/_components/sign-up-form";
 
-
 export const metadata: Metadata = {
-  title: 'Sign Up',
-  description: 'Sign Up to Posts Buddy'
+  title: "Sign Up",
+  description: "Sign Up to Posts Buddy",
 };
 
 export default function SignUpPage() {

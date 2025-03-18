@@ -1,5 +1,5 @@
-import { Separator } from '@acme/ui/separator';
-import { AccountForm } from '~/app/dashboard/settings/account/account-form';
+import { Separator } from "@acme/ui/separator";
+import { AccountForm } from "~/app/dashboard/settings/account/account-form";
 
 export default function SettingsAccountPage() {
   return (

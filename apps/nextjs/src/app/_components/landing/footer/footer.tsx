@@ -1,6 +1,6 @@
-import Link from 'next/link';
-import React from 'react';
-import { BuildingIcon, Mail, Phone } from 'lucide-react';
+import Link from "next/link";
+import React from "react";
+import { BuildingIcon, Mail, Phone } from "lucide-react";
 
 function Footer() {
   return (
@@ -13,7 +13,8 @@ function Footer() {
               <span className="font-semibold">Enterprise Suite</span>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Streamlining business operations with integrated enterprise solutions.
+              Streamlining business operations with integrated enterprise
+              solutions.
             </p>
           </div>
           <div className="space-y-4">
@@ -109,11 +110,17 @@ function Footer() {
             © 2024 Enterprise Suite. All rights reserved.
           </p>
           <div className="mt-4 flex space-x-6 md:mt-0">
-            <a href="mailto:contact@enterprise-suite.com" className="text-gray-600 dark:text-gray-400">
+            <a
+              href="mailto:contact@enterprise-suite.com"
+              className="text-gray-600 dark:text-gray-400"
+            >
               <Mail className="h-4 w-4" />
               <span className="sr-only">Email</span>
             </a>
-            <a href="tel:+1-555-123-4567" className="text-gray-600 dark:text-gray-400">
+            <a
+              href="tel:+1-555-123-4567"
+              className="text-gray-600 dark:text-gray-400"
+            >
               <Phone className="h-4 w-4" />
               <span className="sr-only">Phone</span>
             </a>

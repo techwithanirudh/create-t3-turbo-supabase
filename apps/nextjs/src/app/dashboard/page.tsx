@@ -7,7 +7,7 @@ import {
   PostList,
 } from "./_components/posts";
 
-import { ScrollArea } from "@acme/ui/scroll-area"
+import { ScrollArea } from "@acme/ui/scroll-area";
 
 export const runtime = "edge";
 

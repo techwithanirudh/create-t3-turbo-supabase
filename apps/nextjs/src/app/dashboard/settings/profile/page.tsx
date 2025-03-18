@@ -1,5 +1,5 @@
-import { Separator } from '@acme/ui/separator';
-import { ProfileForm } from '~/app/dashboard/settings/profile/profile-form';
+import { Separator } from "@acme/ui/separator";
+import { ProfileForm } from "~/app/dashboard/settings/profile/profile-form";
 
 export default function SettingsProfilePage() {
   return (

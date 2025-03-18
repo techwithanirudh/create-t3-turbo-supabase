@@ -32,9 +32,10 @@ export default function FAQ() {
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Our platform includes comprehensive CRM tools, secure file storage and sharing,
-                  team messaging and collaboration, advanced document/PDF management with version control,
-                  and an AI-powered chatbot to streamline internal processes.
+                  Our platform includes comprehensive CRM tools, secure file
+                  storage and sharing, team messaging and collaboration,
+                  advanced document/PDF management with version control, and an
+                  AI-powered chatbot to streamline internal processes.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -44,8 +45,10 @@ export default function FAQ() {
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  We implement enterprise-grade security with end-to-end encryption, role-based access controls,
-                  regular security audits, and compliance with industry standards including GDPR, HIPAA, and SOC 2.
+                  We implement enterprise-grade security with end-to-end
+                  encryption, role-based access controls, regular security
+                  audits, and compliance with industry standards including GDPR,
+                  HIPAA, and SOC 2.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -55,8 +58,10 @@ export default function FAQ() {
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Yes, our platform is highly customizable. We offer white-labeling options, custom workflows,
-                  API integrations with your existing tools, and dedicated support for enterprise-specific requirements.
+                  Yes, our platform is highly customizable. We offer
+                  white-labeling options, custom workflows, API integrations
+                  with your existing tools, and dedicated support for
+                  enterprise-specific requirements.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -68,8 +73,10 @@ export default function FAQ() {
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Our document management system provides version history tracking, automated OCR for searchable PDFs,
-                  collaborative editing, approval workflows, and secure sharing with fine-grained permissions.
+                  Our document management system provides version history
+                  tracking, automated OCR for searchable PDFs, collaborative
+                  editing, approval workflows, and secure sharing with
+                  fine-grained permissions.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -79,9 +86,10 @@ export default function FAQ() {
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Enterprise clients receive 24/7 priority support, a dedicated account manager,
-                  regular training sessions, implementation assistance, and access to our knowledge base
-                  with best practices and configuration guides.
+                  Enterprise clients receive 24/7 priority support, a dedicated
+                  account manager, regular training sessions, implementation
+                  assistance, and access to our knowledge base with best
+                  practices and configuration guides.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -91,8 +99,10 @@ export default function FAQ() {
               </AccordionTrigger>
               <AccordionContent>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Yes, our platform is fully responsive and works across all devices. We also offer dedicated
-                  mobile apps for iOS and Android with offline capabilities and secure push notifications.
+                  Yes, our platform is fully responsive and works across all
+                  devices. We also offer dedicated mobile apps for iOS and
+                  Android with offline capabilities and secure push
+                  notifications.
                 </p>
               </AccordionContent>
             </AccordionItem>

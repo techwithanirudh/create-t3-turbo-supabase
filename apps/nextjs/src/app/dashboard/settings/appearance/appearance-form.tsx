@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { Button } from '@acme/ui/button';
+import { Button } from "@acme/ui/button";
 import {
   Form,
   FormControl,
@@ -12,44 +12,44 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '@acme/ui/form';
+  FormMessage,
+} from "@acme/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
-} from '@acme/ui/select';
-import { RadioGroup, RadioGroupItem } from '@acme/ui/radio-group';
-import { toast } from 'sonner';
+  SelectValue,
+} from "@acme/ui/select";
+import { RadioGroup, RadioGroupItem } from "@acme/ui/radio-group";
+import { toast } from "sonner";
 
 const appearanceFormSchema = z.object({
-  theme: z.enum(['light', 'dark'], {
-    required_error: 'Please select a theme.'
+  theme: z.enum(["light", "dark"], {
+    required_error: "Please select a theme.",
   }),
-  font: z.enum(['inter', 'manrope', 'system'], {
-    invalid_type_error: 'Select a font',
-    required_error: 'Please select a font.'
-  })
+  font: z.enum(["inter", "manrope", "system"], {
+    invalid_type_error: "Select a font",
+    required_error: "Please select a font.",
+  }),
 });
 
 type AppearanceFormValues = z.infer<typeof appearanceFormSchema>;
 
 // This can come from your database or API.
 const defaultValues: Partial<AppearanceFormValues> = {
-  theme: 'light'
+  theme: "light",
 };
 
 export function AppearanceForm() {
   const form = useForm<AppearanceFormValues>({
     resolver: zodResolver(appearanceFormSchema),
-    defaultValues
+    defaultValues,
   });
 
   function onSubmit(data: AppearanceFormValues) {
     console.log(JSON.stringify(data, null, 2));
-    toast('Appearance settings updated successfully');
+    toast("Appearance settings updated successfully");
   }
 
   return (

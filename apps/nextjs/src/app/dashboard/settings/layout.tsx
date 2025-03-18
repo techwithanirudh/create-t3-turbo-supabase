@@ -1,12 +1,13 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
-import { Separator } from '@acme/ui/separator';
-import { SidebarNav } from '~/app/dashboard/settings/_components/sidebar-nav';
-import { settingsNavItems } from '~/app/dashboard/config/nav';
+import { Separator } from "@acme/ui/separator";
+import { SidebarNav } from "~/app/dashboard/settings/_components/sidebar-nav";
+import { settingsNavItems } from "~/app/dashboard/config/nav";
 
 export const metadata: Metadata = {
-  title: 'Settings',
-  description: 'Enterprise Suite settings. Customize your preferences and configure your account settings here.'
+  title: "Settings",
+  description:
+    "Enterprise Suite settings. Customize your preferences and configure your account settings here.",
 };
 
 interface SettingsLayoutProps {

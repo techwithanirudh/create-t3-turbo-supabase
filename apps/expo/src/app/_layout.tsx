@@ -59,7 +59,8 @@ export default function RootLayout() {
         // @ts-expect-error -- React Native Web-specific code
         if (typeof (document as unknown as Document) !== "undefined") {
           // @ts-expect-error -- React Native Web-specific code
-          const documentElement = (document as unknown as Document).documentElement as { classList: { add: (cls: string) => void } };
+          const documentElement = (document as unknown as Document)
+            .documentElement as { classList: { add: (cls: string) => void } };
           documentElement.classList.add("bg-background");
         }
       }

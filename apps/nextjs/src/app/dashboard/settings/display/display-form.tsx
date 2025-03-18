@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { Button } from '@acme/ui/button';
-import { Checkbox } from '@acme/ui/checkbox';
+import { Button } from "@acme/ui/button";
+import { Checkbox } from "@acme/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -13,63 +13,63 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '@acme/ui/form';
-import { toast } from 'sonner';
+  FormMessage,
+} from "@acme/ui/form";
+import { toast } from "sonner";
 
 const items = [
   {
-    id: 'recents',
-    label: 'Recents'
+    id: "recents",
+    label: "Recents",
   },
   {
-    id: 'home',
-    label: 'Home'
+    id: "home",
+    label: "Home",
   },
   {
-    id: 'applications',
-    label: 'Applications'
+    id: "applications",
+    label: "Applications",
   },
   {
-    id: 'desktop',
-    label: 'Desktop'
+    id: "desktop",
+    label: "Desktop",
   },
   {
-    id: 'downloads',
-    label: 'Downloads'
+    id: "downloads",
+    label: "Downloads",
   },
   {
-    id: 'documents',
-    label: 'Documents'
-  }
+    id: "documents",
+    label: "Documents",
+  },
 ] as const;
 
 const displayFormSchema = z.object({
   items: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: 'You have to select at least one item.'
-  })
+    message: "You have to select at least one item.",
+  }),
 });
 
 type DisplayFormValues = z.infer<typeof displayFormSchema>;
 
 // This can come from your database or API.
 const defaultValues: Partial<DisplayFormValues> = {
-  items: ['recents', 'home']
+  items: ["recents", "home"],
 };
 
 export function DisplayForm() {
   const form = useForm<DisplayFormValues>({
     resolver: zodResolver(displayFormSchema),
-    defaultValues
+    defaultValues,
   });
 
   function onSubmit(data: DisplayFormValues) {
-    toast('You submitted the following values:', {
+    toast("You submitted the following values:", {
       description: (
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(data, null, 2)}</code>
         </pre>
-      )
+      ),
     });
   }
 
@@ -106,8 +106,8 @@ export function DisplayForm() {
                                 ? field.onChange([...field.value, item.id])
                                 : field.onChange(
                                     field.value.filter(
-                                      (value) => value !== item.id
-                                    )
+                                      (value) => value !== item.id,
+                                    ),
                                   );
                             }}
                           />

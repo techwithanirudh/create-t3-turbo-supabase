@@ -1,5 +1,5 @@
-import { Separator } from '@acme/ui/separator';
-import { NotificationsForm } from '~/app/dashboard/settings/notifications/notifications-form';
+import { Separator } from "@acme/ui/separator";
+import { NotificationsForm } from "~/app/dashboard/settings/notifications/notifications-form";
 
 export default function SettingsNotificationsPage() {
   return (

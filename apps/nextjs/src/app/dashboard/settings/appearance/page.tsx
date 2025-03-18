@@ -1,5 +1,5 @@
-import { Separator } from '@acme/ui/separator';
-import { AppearanceForm } from '~/app/dashboard/settings/appearance/appearance-form';
+import { Separator } from "@acme/ui/separator";
+import { AppearanceForm } from "~/app/dashboard/settings/appearance/appearance-form";
 
 export default function SettingsAppearancePage() {
   return (

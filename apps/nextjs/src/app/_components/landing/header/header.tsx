@@ -1,8 +1,8 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { MenuIcon, BuildingIcon, XIcon } from 'lucide-react';
+"use client";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { MenuIcon, BuildingIcon, XIcon } from "lucide-react";
 import { ThemeToggle } from "@acme/ui/theme";
 
 function Header() {
@@ -19,36 +19,36 @@ function Header() {
       }
     };
 
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const menuVariants = {
     open: {
-      height: 'auto',
+      height: "auto",
       opacity: 1,
       transition: {
-        height: { duration: 0.5, ease: 'easeInOut' },
-        opacity: { duration: 1, ease: 'easeInOut' }
-      }
+        height: { duration: 0.5, ease: "easeInOut" },
+        opacity: { duration: 1, ease: "easeInOut" },
+      },
     },
     initial: {
       height: 0,
       opacity: 0,
       transition: {
-        height: { duration: 0.5, ease: 'easeInOut' },
-        opacity: { duration: 0.25, ease: 'easeInOut' }
-      }
+        height: { duration: 0.5, ease: "easeInOut" },
+        opacity: { duration: 0.25, ease: "easeInOut" },
+      },
     },
     closed: {
       height: 0,
       opacity: 0,
       transition: {
-        height: { duration: 0.5, ease: 'easeInOut' },
-        opacity: { duration: 0.25, ease: 'easeInOut' }
-      }
-    }
+        height: { duration: 0.5, ease: "easeInOut" },
+        opacity: { duration: 0.25, ease: "easeInOut" },
+      },
+    },
   };
 
   return (
@@ -61,7 +61,7 @@ function Header() {
           </Link>
 
           <button className="md:hidden" onClick={toggleMenu}>
-            <span className="sr-only">{isOpen ? 'Close' : 'Menu'}</span>
+            <span className="sr-only">{isOpen ? "Close" : "Menu"}</span>
             {isOpen ? (
               <XIcon className="h-6 w-6" />
             ) : (
@@ -102,7 +102,7 @@ function Header() {
       <motion.div
         variants={menuVariants}
         initial="closed"
-        animate={isOpen ? 'open' : 'closed'}
+        animate={isOpen ? "open" : "closed"}
         className="bg-transparent md:hidden"
       >
         <div className="flex flex-col gap-4 p-4">

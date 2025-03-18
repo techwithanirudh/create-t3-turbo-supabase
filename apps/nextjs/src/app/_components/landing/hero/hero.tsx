@@ -21,7 +21,8 @@ export default function Hero() {
           </div>
           <div className="flex flex-col items-start space-y-4">
             <p className="mx-auto max-w-[700px] text-gray-600 dark:text-gray-400 md:text-xl">
-              Streamline your company operations with our unified platform for CRM, storage, messaging, document management, and AI assistance.
+              Streamline your company operations with our unified platform for
+              CRM, storage, messaging, document management, and AI assistance.
             </p>
             <div className="space-x-4">
               <Button asChild>

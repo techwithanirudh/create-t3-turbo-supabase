@@ -1,19 +1,15 @@
-"use client"
+"use client";
 
-import Link from "next/link"
+import Link from "next/link";
 
-import { cn } from "@acme/ui"
-import { buttonVariants } from "@acme/ui/button"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@acme/ui/tooltip"
-import type { NavItem } from "~/app/dashboard/config/nav"
+import { cn } from "@acme/ui";
+import { buttonVariants } from "@acme/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
+import type { NavItem } from "~/app/dashboard/config/nav";
 
 export interface NavProps {
-  isCollapsed: boolean
-  links: NavItem[]
+  isCollapsed: boolean;
+  links: NavItem[];
 }
 
 export function Nav({ links, isCollapsed }: NavProps) {
@@ -28,12 +24,12 @@ export function Nav({ links, isCollapsed }: NavProps) {
             <Tooltip key={index} delayDuration={0}>
               <TooltipTrigger asChild>
                 <Link
-                  href={link.href ?? '#'}
+                  href={link.href ?? "#"}
                   className={cn(
                     buttonVariants({ variant: link.variant, size: "icon" }),
                     "h-9 w-9",
                     link.variant === "default" &&
-                    "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white"
+                      "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white",
                   )}
                 >
                   {link.icon && <link.icon className="h-4 w-4" />}
@@ -52,12 +48,12 @@ export function Nav({ links, isCollapsed }: NavProps) {
           ) : (
             <Link
               key={index}
-              href={link.href ?? '#'}
+              href={link.href ?? "#"}
               className={cn(
                 buttonVariants({ variant: link.variant, size: "sm" }),
                 link.variant === "default" &&
-                "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
-                "justify-start"
+                  "dark:bg-muted dark:text-white dark:hover:bg-muted dark:hover:text-white",
+                "justify-start",
               )}
             >
               {link.icon && <link.icon className="mr-2 h-4 w-4" />}
@@ -67,16 +63,16 @@ export function Nav({ links, isCollapsed }: NavProps) {
                   className={cn(
                     "ml-auto",
                     link.variant === "default" &&
-                    "text-background dark:text-white"
+                      "text-background dark:text-white",
                   )}
                 >
                   {link.label}
                 </span>
               )}
             </Link>
-          )
+          ),
         )}
       </nav>
     </div>
-  )
+  );
 }

@@ -18,8 +18,8 @@ export default function Features() {
               Comprehensive Enterprise Solutions
             </h2>
             <p className="max-w-[900px] text-gray-600 dark:text-gray-400 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              Our integrated platform delivers essential tools to optimize your company's operations
-              and collaboration workflows.
+              Our integrated platform delivers essential tools to optimize your
+              company's operations and collaboration workflows.
             </p>
           </div>
         </div>
@@ -30,7 +30,8 @@ export default function Features() {
                 Customer Relationship Management
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Centralized customer data, interaction tracking, and sales pipeline management.
+                Centralized customer data, interaction tracking, and sales
+                pipeline management.
               </p>
             </CardHeader>
           </Card>
@@ -40,7 +41,8 @@ export default function Features() {
                 Secure File Storage
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Enterprise-grade storage with encryption, access controls, and unlimited capacity.
+                Enterprise-grade storage with encryption, access controls, and
+                unlimited capacity.
               </p>
             </CardHeader>
           </Card>
@@ -50,7 +52,8 @@ export default function Features() {
                 Team Messaging
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Real-time communication with channels, direct messages, and video conferencing.
+                Real-time communication with channels, direct messages, and
+                video conferencing.
               </p>
             </CardHeader>
           </Card>
@@ -60,7 +63,8 @@ export default function Features() {
                 Document Management
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Comprehensive document workflows with version control and approval processes.
+                Comprehensive document workflows with version control and
+                approval processes.
               </p>
             </CardHeader>
           </Card>
@@ -70,7 +74,8 @@ export default function Features() {
                 AI-Powered Chatbot
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Intelligent virtual assistant to automate tasks and provide instant support.
+                Intelligent virtual assistant to automate tasks and provide
+                instant support.
               </p>
             </CardHeader>
           </Card>
@@ -80,7 +85,8 @@ export default function Features() {
                 Advanced Analytics
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Data-driven insights and customizable reports for informed decision-making.
+                Data-driven insights and customizable reports for informed
+                decision-making.
               </p>
             </CardHeader>
           </Card>

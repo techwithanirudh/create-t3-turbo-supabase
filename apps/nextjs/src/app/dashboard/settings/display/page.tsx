@@ -1,6 +1,5 @@
-
-import { Separator } from '@acme/ui/separator';
-import { DisplayForm } from '~/app/dashboard/settings/display/display-form';
+import { Separator } from "@acme/ui/separator";
+import { DisplayForm } from "~/app/dashboard/settings/display/display-form";
 
 export default function SettingsDisplayPage() {
   return (

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-import { cn } from '@acme/ui';
-import { buttonVariants } from '@acme/ui/button';
-import { Separator } from '@acme/ui/separator';
-import { ScrollArea } from '@acme/ui/scroll-area';
+import { cn } from "@acme/ui";
+import { buttonVariants } from "@acme/ui/button";
+import { Separator } from "@acme/ui/separator";
+import { ScrollArea } from "@acme/ui/scroll-area";
 
 interface NavItem {
   title: string;
@@ -30,10 +30,7 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
   return (
     <ScrollArea className="h-[calc(100vh-12rem)]">
       <nav
-        className={cn(
-          'flex flex-col space-y-1 px-4 py-2 sm:px-2',
-          className
-        )}
+        className={cn("flex flex-col space-y-1 px-4 py-2 sm:px-2", className)}
         {...props}
       >
         {items.map((item, index) => {
@@ -42,25 +39,29 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
           }
 
           if (item.items) {
-            const isGroupActive = item.items.some(subItem => isActive(subItem.href));
+            const isGroupActive = item.items.some((subItem) =>
+              isActive(subItem.href),
+            );
             return (
               <div key={item.title} className="space-y-2">
-                <h4 className={cn(
-                  "px-2 py-1 text-sm font-semibold tracking-tight",
-                  isGroupActive ? "text-primary" : "text-muted-foreground"
-                )}>
+                <h4
+                  className={cn(
+                    "px-2 py-1 text-sm font-semibold tracking-tight",
+                    isGroupActive ? "text-primary" : "text-muted-foreground",
+                  )}
+                >
                   {item.title}
                 </h4>
                 {item.items.map((subItem) => (
                   <Link
                     key={subItem.href}
-                    href={subItem.href ?? '#'}
+                    href={subItem.href ?? "#"}
                     className={cn(
-                      buttonVariants({ variant: 'ghost', size: 'sm' }),
+                      buttonVariants({ variant: "ghost", size: "sm" }),
                       isActive(subItem.href)
-                        ? 'bg-muted hover:bg-muted font-medium text-primary'
-                        : 'hover:bg-muted text-muted-foreground hover:text-primary',
-                      'w-full justify-start'
+                        ? "bg-muted hover:bg-muted font-medium text-primary"
+                        : "hover:bg-muted text-muted-foreground hover:text-primary",
+                      "w-full justify-start",
                     )}
                   >
                     {subItem.title}
@@ -73,13 +74,13 @@ export function SidebarNav({ className, items, ...props }: SidebarNavProps) {
           return (
             <Link
               key={item.href}
-              href={item.href ?? '#'}
+              href={item.href ?? "#"}
               className={cn(
-                buttonVariants({ variant: 'ghost', size: 'sm' }),
+                buttonVariants({ variant: "ghost", size: "sm" }),
                 isActive(item.href)
-                  ? 'bg-muted hover:bg-muted font-medium text-primary'
-                  : 'hover:bg-muted text-muted-foreground hover:text-primary',
-                'w-full justify-start'
+                  ? "bg-muted hover:bg-muted font-medium text-primary"
+                  : "hover:bg-muted text-muted-foreground hover:text-primary",
+                "w-full justify-start",
               )}
             >
               {item.title}
