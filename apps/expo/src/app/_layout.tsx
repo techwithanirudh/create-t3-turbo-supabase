@@ -55,14 +55,9 @@ export default function RootLayout() {
     (async () => {
       const theme = await AsyncStorage.getItem("theme");
       if (Platform.OS === "web") {
-        // Adds the background color to the html element to prevent white background on overscroll.
-        // @ts-expect-error -- React Native Web-specific code
-        if (typeof (document as unknown as Document) !== "undefined") {
-          // @ts-expect-error -- React Native Web-specific code
-          const documentElement = (document as unknown as Document)
-            .documentElement as { classList: { add: (cls: string) => void } };
-          documentElement.classList.add("bg-background");
-        }
+        // @ts-expect-error: Ignore TypeScript errors
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        document.documentElement.classList.add("bg-background");
       }
       if (!theme) {
         setAndroidNavigationBar(colorScheme);
