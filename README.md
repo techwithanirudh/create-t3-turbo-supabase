@@ -1,143 +1,196 @@
 # T3 Turbo x Supabase
 
-> This is a clone of trevorpfiz's t3-supabase with a landing page and react native reusables.
+A full-stack, typesafe starter monorepo with Next.js, React Native, and Supabase, featuring:
 
-![CleanShot 2023-04-11 at 23 42 53@2x](https://user-images.githubusercontent.com/51714798/231294720-1c64b391-4ecf-42d2-aad2-8c486c5d6bf5.png)
-
-## About
-
-This is an extended version of [create-t3-turbo](https://github.com/t3-oss/create-t3-turbo) implementing authentication using [Supabase Auth](https://supabase.com/docs/guides/auth) on both the web and mobile applications.
-
-### Side note for mobile
-
-**iOS:** One of the requirements for Apple's review process requires you to implement native `Sign in with Apple` if you're providing any other third party authentication method. Read more in [Section 4.8 - Design: Sign in with Apple](https://developer.apple.com/app-store/review/guidelines/#sign-in-with-apple).
-
-We have preconfigured this for you which you can find [here](./apps/expo/src/utils/auth.ts). All you need to do is to enable the Apple Provider in your [Supabase dashboard](https://app.supabase.com) and fill in your information.
-
-> We currently only supports `Sign in with Apple` - support for more providers on mobile are being worked on!
+- 🏎 Turborepo
+- 🚀 Next.js (web) + Expo (mobile)
+- 🔐 Supabase Auth
+- 🎨 Tailwind CSS
+- 💻 TypeScript
+- 📱 React Native
+- 🧰 Turbo Generators
 
 ## Quick Start
 
-To get it running, follow the steps below:
+### 1. Run the Setup Script
 
-### Setup dependencies
-
-```diff
-# Install dependencies
-pnpm i
-
-# Configure environment variables.
-# There is an `.env.example` in the root directory you can use for reference
-# Ensure that the POSTGRES_URL is in the same format as in the example
-cp .env.example .env
-
-# Push the Drizzle schema to your database (w/ drizzle-kit push)
-pnpm db:push
-
-# Or use migrations (w/ drizzle-kit generate and drizzle-kit migrate)
-pnpm db:generate
-pnpm db:migrate
+```bash
+./setup-project.sh
 ```
 
-> **NOTE:** Migrations seem preferable for Supabase. Still figuring out the best way to do migrations for local development/branching. <https://twitter.com/plushdohn/status/1780126181490135371>
+The setup script automates the following:
 
-### Setting up Supabase
+1. **Environment Setup**
 
-1. Go to [the Supabase dashboard](https://app.supabase.com/projects) and create a new project.
-2. Under project settings, retrieve the environment variables `reference id`, `project url` & `anon public key` and paste them into [.env](./.env.example) and [apps/expo/.env](./apps/expo/.env.example) in the necessary places. You'll also need the database password you set when creating the project.
-3. Under `Auth`, configure any auth provider(s) of your choice. This repo is using Github for Web and Apple for Mobile.
-4. If you want to use the `Email` provider and `email confirmation`, go to `Auth` -> `Email Templates` and change the `Confirm signup` from `{{ .ConfirmationURL }}` to `{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=signup`, according to <https://supabase.com/docs/guides/auth/redirect-urls#email-templates-when-using-redirectto>. `.RedirectTo` will need to be added to your `Redirect URLs` in the next step.
-5. Under `Auth` -> `URL Configuration`, set the `Site URL` to your production URL and add `http://localhost:3000/**` and `https://*-username.vercel.app/**` to `Redirect URLs` as detailed here <https://supabase.com/docs/guides/auth/redirect-urls#vercel-preview-urls>.
-6. Setup a trigger when a new user signs up: <https://supabase.com/docs/guides/auth/managing-user-data#using-triggers>. Can run this in the SQL Editor.
+   - Creates `.env` file with all necessary variables
+   - Installs required tools (Homebrew, Node.js, pnpm, Supabase CLI, Vercel CLI)
 
-```sql
--- inserts a row into public.profile
-create function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer set search_path = public
-as $$
-begin
-  insert into public.t3turbo_profile (id, email, name, image)
-  values (
-    new.id,
-    new.email,
-    COALESCE(
-      new.raw_user_meta_data ->> 'name',
-      new.raw_user_meta_data ->> 'full_name',
-      new.raw_user_meta_data ->> 'user_name',
-      '[redacted]'
-    ),
-    new.raw_user_meta_data ->> 'avatar_url'
-  )
-  on conflict (id) do update set
-    email = excluded.email,
-    name = excluded.name,
-    image = excluded.image;
-  return new;
-end;
-$$;
+2. **Project Initialization**
 
--- trigger the function every time a user is created
-create trigger on_auth_user_created
-  after insert on auth.users
-  for each row execute procedure public.handle_new_user();
+   - Clones the repository
+   - Sets up a new Git repository
+   - Creates and pushes to a new GitHub repository
 
--- trigger the function when a user signs in/their email is confirmed to get missing values
-create trigger on_auth_user_verified
-  after update on auth.users
-  for each row when (
-    old.last_sign_in_at is null
-    and new.last_sign_in_at is not null
-  ) execute procedure public.handle_new_user();
+3. **Vercel Configuration**
+
+   - Links project to Vercel
+   - Sets up project configuration (root directory, framework, build commands)
+   - Configures environment variables
+
+4. **Supabase Setup**
+
+   - Creates a new Supabase project
+   - Configures auth settings
+   - Sets up database connection
+   - Links project locally
+
+5. **Environment Configuration**
+
+   - Pulls environment variables from Vercel
+   - Sets up all necessary API keys and connection strings
+   - Configures both development and production environments
+
+6. **Initial Deployment**
+   - Deploys the application to Vercel
+   - Sets up continuous deployment from GitHub
+
+### 2. Post-Setup Configuration
+
+After running the setup script, you'll need to:
+
+1. **Configure Supabase Auth**
+
+   - Go to your Supabase dashboard -> Auth -> Providers
+   - Set up desired auth providers:
+     - For web: GitHub recommended
+     - For iOS: Apple Sign-In required (App Store requirement)
+   - Configure redirect URLs:
+     ```
+     http://localhost:3000/**
+     https://*-username.vercel.app/**
+     ```
+
+2. **Set Up Database Trigger**
+   Run this SQL in your Supabase SQL Editor:
+
+   ```sql
+   -- Create profile handler function
+   create function public.handle_new_user()
+   returns trigger
+   language plpgsql
+   security definer set search_path = public
+   as $$
+   begin
+     insert into public.t3turbo_profile (id, email, name, image)
+     values (
+       new.id,
+       new.email,
+       COALESCE(
+         new.raw_user_meta_data ->> 'name',
+         new.raw_user_meta_data ->> 'full_name',
+         new.raw_user_meta_data ->> 'user_name',
+         '[redacted]'
+       ),
+       new.raw_user_meta_data ->> 'avatar_url'
+     )
+     on conflict (id) do update set
+       email = excluded.email,
+       name = excluded.name,
+       image = excluded.image;
+     return new;
+   end;
+   $$;
+
+   -- Create triggers
+   create trigger on_auth_user_created
+     after insert on auth.users
+     for each row execute procedure public.handle_new_user();
+
+   create trigger on_auth_user_verified
+     after update on auth.users
+     for each row when (
+       old.last_sign_in_at is null
+       and new.last_sign_in_at is not null
+     ) execute procedure public.handle_new_user();
+   ```
+
+3. **Secure Database Access**
+   Run this SQL to disable direct public access:
+   ```sql
+   REVOKE USAGE ON SCHEMA public FROM anon, authenticated;
+   ```
+
+## Development
+
+### Web (Next.js)
+
+```bash
+pnpm dev
 ```
 
-```sql
--- drop a trigger if needed
-drop trigger "on_auth_user_verified" on auth.users;
+### Mobile (Expo)
+
+```bash
+# iOS Simulator
+pnpm --filter expo dev
+
+# Android Emulator
+pnpm --filter expo dev --android
 ```
 
-7. Remove access to the `public` schema as we are only using the server
+## Package Generation
 
-By default, Supabase exposes the `public` schema to the PostgREST API to allow the `supabase-js` client query the database directly from the client. However, since we route all our requests through the Next.js application (through tRPC), we don't want our client to have this access. To disable this, execute the following SQL query in the SQL Editor on your Supabase dashboard:
+This project includes Turbo Generators for scaffolding new packages. To create a new package:
 
-```sql
-REVOKE USAGE ON SCHEMA public FROM anon, authenticated;
+```bash
+turbo gen init
 ```
 
-![disable public access](https://user-images.githubusercontent.com/51714798/231810706-88b1db82-0cfd-485f-9043-ef12a53dc62f.png)
+The generator will prompt for:
 
-> Note: This means you also don't need to enable row-level security (RLS) on your database if you don't want to.
+1. Package name (automatically prefixed with @acme/)
+2. Dependencies to install
 
-### Configure Expo `dev`-script
+Generated packages include:
 
-#### Use iOS Simulator
+- TypeScript configuration
+- ESLint setup
+- Standard npm scripts
+- Proper monorepo integration
 
-1. Make sure you have XCode and XCommand Line Tools installed [as shown on expo docs](https://docs.expo.dev/workflow/ios-simulator/).
-   > **NOTE:** If you just installed XCode, or if you have updated it, you need to open the simulator manually once. Run `npx expo start` in the root dir, and then enter `I` to launch Expo Go. After the manual launch, you can run `pnpm dev` in the root directory.
+For detailed generator documentation, see [Turbo Generators](./turbo/GENERATORS.md).
 
-```diff
-+  "dev": "expo start --ios",
-```
+## Mobile Development Notes
 
-3. Run `pnpm dev` at the project root folder.
+For iOS development, Apple Sign-In is required if you're using any third-party authentication (App Store requirement). The setup is preconfigured in `apps/expo/src/utils/auth.ts`.
 
-> **TIP:** It might be easier to run each app in separate terminal windows so you get the logs from each app separately. This is also required if you want your terminals to be interactive, e.g. to access the Expo QR code. You can run `pnpm --filter expo dev` and `pnpm --filter nextjs dev` to run each app in a separate terminal window.
+## Contributing
 
-#### For Android
+1. Create a new branch
+2. Make your changes
+3. Create a PR
+4. Ensure CI passes
+5. Get approval and merge
 
-1. Install Android Studio tools [as shown on expo docs](https://docs.expo.dev/workflow/android-studio-emulator/).
-2. Change the `dev` script at `apps/expo/package.json` to open the Android emulator.
+## Troubleshooting
 
-```diff
-+  "dev": "expo start --android",
-```
+If you encounter issues:
 
-3. Run `pnpm dev` at the project root folder.
+1. **Environment Variables**
 
-## References
+   - Verify all variables in `.env`
+   - Check Vercel project settings
+   - Ensure Supabase connection strings are correct
 
-- For more useful information on how to deploy this stack, refer to [t3-oss/create-t3-turbo](https://github.com/t3-oss/create-t3-turbo).
-- [Supabase Documentation](https://supabase.com/docs)
-- This stack originates from [create-t3-app](https://github.com/t3-oss/create-t3-app).
-- A [blog post](https://jumr.dev/blog/t3-turbo) where I wrote how to migrate a T3 app into this.
+2. **Database Issues**
+
+   - Verify Supabase project is active
+   - Check database triggers are properly set up
+   - Ensure schema migrations are applied
+
+3. **Auth Problems**
+   - Verify auth provider configuration
+   - Check redirect URLs in Supabase
+   - Ensure proper API keys are set
+
+For more help, check the [issues](https://github.com/t3-oss/create-t3-turbo/issues) or create a new one.
