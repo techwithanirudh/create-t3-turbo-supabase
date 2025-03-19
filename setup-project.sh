@@ -169,7 +169,7 @@ PROJECT_NAME=${PROJECT_NAME:-$(generate_project_name)}
 # Set project directory
 PROJECT_DIR="$HOME/Desktop/${PROJECT_NAME}"
 
-REPO_URL="https://github.com/t3-oss/create-t3-turbo.git"
+REPO_URL="https://github.com/pedromshin/create-t3-turbo-supabase"
 DB_PASSWORD=$(openssl rand -base64 16)
 JWT_SECRET=$(openssl rand -base64 32)
 
