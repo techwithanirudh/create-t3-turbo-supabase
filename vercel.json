@@ -1,5 +1,5 @@
 {
-  "github": {
-    "silent": true
-  }
+  "buildCommand": "pnpm turbo build",
+  "outputDirectory": "apps/nextjs/.next",
+  "framework": "nextjs"
 }

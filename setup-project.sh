@@ -705,8 +705,20 @@ if ! vercel project settings framework nextjs; then
     echo -e "${YELLOW}Warning: Failed to set framework settings${NC}"
 fi
 
-# No need to set custom build command or output directory since we're using the default Next.js setup
-# The framework preset will handle these automatically
+# Set build command for monorepo
+if ! vercel project settings buildCommand "cd ../.. && pnpm install && pnpm turbo run build --filter=@acme/nextjs..."; then
+    echo -e "${YELLOW}Warning: Failed to set build command${NC}"
+fi
+
+# Set output directory
+if ! vercel project settings outputDirectory ".next"; then
+    echo -e "${YELLOW}Warning: Failed to set output directory${NC}"
+fi
+
+# Set install command
+if ! vercel project settings installCommand "pnpm install"; then
+    echo -e "${YELLOW}Warning: Failed to set install command${NC}"
+fi
 
 # Deploy to Vercel
 echo -e "\n${BLUE}Deploying to Vercel...${NC}"
