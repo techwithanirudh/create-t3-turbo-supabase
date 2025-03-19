@@ -99,9 +99,9 @@ set_vercel_env_vars() {
     echo -e "\n${BLUE}Setting environment variables in Vercel...${NC}"
     
     # Construct database URLs
-    local postgres_url="postgres://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}"
-    local postgres_prisma_url="postgres://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}?pgbouncer=true&connection_limit=1"
-    local postgres_url_non_pooling="postgres://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}"
+    local postgres_url="postgresql://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}"
+    local postgres_prisma_url="postgresql://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}?pgbouncer=true&connection_limit=1"
+    local postgres_url_non_pooling="postgresql://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}"
     
     # Set all environment variables
     local vars=(
@@ -473,50 +473,69 @@ fi
 
 echo -e "${GREEN}Successfully created project with ID: ${SUPABASE_PROJECT_ID}${NC}"
 
-# Wait for project to be ready
-echo -e "${BLUE}Waiting for Supabase project to be ready...${NC}"
-echo -e "This may take a few minutes. Checking project status..."
+# Since we already have access to the project dashboard and API keys,
+# we can skip the waiting period and use default connection values
+echo -e "${BLUE}Setting up database connection details...${NC}"
 
-# Function to check if project is ready
-check_project_ready() {
-    local project_id=$1
-    local status
-    
-    if status=$(supabase projects get --project-ref "$project_id" 2>/dev/null); then
-        if echo "$status" | grep -q '"status": "ACTIVE"'; then
-            return 0
+# Get API keys from user
+echo -e "\n${BLUE}Please enter the anon public key from the dashboard:${NC}"
+read -r ANON_KEY
+echo -e "${BLUE}Please enter the service role key from the dashboard:${NC}"
+read -r SERVICE_ROLE_KEY
+echo -e "${BLUE}Please enter the database password from the dashboard:${NC}"
+read -r DB_PASSWORD
+
+if [ -z "$ANON_KEY" ] || [ -z "$SERVICE_ROLE_KEY" ] || [ -z "$DB_PASSWORD" ]; then
+    echo -e "${RED}API keys and database password are required to continue${NC}"
+    exit 1
+fi
+
+# Wait for user confirmation that project is ready
+echo -e "\n${YELLOW}Waiting for Supabase project to be fully ready...${NC}"
+echo -e "Please wait until you see the project is ready in the Supabase dashboard:"
+echo -e "${GREEN}https://supabase.com/dashboard/project/${SUPABASE_PROJECT_ID}${NC}"
+echo -e "Press Enter when the project shows as 'Ready' in the dashboard..."
+read -r
+
+# Verify database connection before proceeding with retries
+echo -e "\n${BLUE}Verifying database connection...${NC}"
+MAX_CONN_RETRIES=5
+CONN_RETRY=0
+CONN_SUCCESS=false
+
+# Construct proper connection string with explicit SSL mode
+PSQL_CONN_STRING="postgresql://postgres:${DB_PASSWORD}@db.${SUPABASE_PROJECT_ID}.supabase.co:5432/postgres?sslmode=require"
+
+while [ $CONN_RETRY -lt $MAX_CONN_RETRIES ] && [ "$CONN_SUCCESS" = false ]; do
+    echo -e "Attempt $((CONN_RETRY + 1)) of ${MAX_CONN_RETRIES}..."
+    # Add -v flag for verbose output to help debug connection issues
+    if PGSSLMODE=require psql "$PSQL_CONN_STRING" -v ON_ERROR_STOP=1 -X --set AUTOCOMMIT=off -c "SELECT version();" > /dev/null 2>&1; then
+        CONN_SUCCESS=true
+        echo -e "${GREEN}✓ Successfully connected to database${NC}"
+    else
+        CONN_RETRY=$((CONN_RETRY + 1))
+        if [ $CONN_RETRY -lt $MAX_CONN_RETRIES ]; then
+            echo -e "${YELLOW}Connection attempt failed. Waiting 15 seconds before retry...${NC}"
+            # Increase wait time to allow for DNS propagation
+            sleep 15
         fi
-    fi
-    return 1
-}
-
-# Wait for project to be ready with timeout
-MAX_WAIT_MINUTES=5
-WAIT_INTERVAL=30
-attempts=$((MAX_WAIT_MINUTES * 60 / WAIT_INTERVAL))
-count=0
-
-while [ $count -lt $attempts ]
-do
-    if check_project_ready "$SUPABASE_PROJECT_ID"; then
-        echo -e "${GREEN}✓ Project is now active${NC}"
-        break
-    fi
-    
-    count=$((count + 1))
-    
-    if [ $count -lt $attempts ]; then
-        echo -e "Project is not ready yet. Waiting ${WAIT_INTERVAL} seconds... (Attempt $count/$attempts)"
-        sleep $WAIT_INTERVAL
     fi
 done
 
-if [ $count -eq $attempts ]; then
-    echo -e "${YELLOW}Project creation is taking longer than expected.${NC}"
-    echo -e "Please check the status at: ${GREEN}https://supabase.com/dashboard/project/${SUPABASE_PROJECT_ID}${NC}"
-    echo -e "Press Enter when the project shows as 'Active' in the dashboard..."
-    read -r
+if [ "$CONN_SUCCESS" = false ]; then
+    echo -e "${RED}Could not connect to database after ${MAX_CONN_RETRIES} attempts. Please verify:${NC}"
+    echo -e "1. The project is fully ready in the Supabase dashboard"
+    echo -e "2. The database password is correct"
+    echo -e "3. Wait a few minutes and try again (DNS propagation can take time)"
+    echo -e "\nConnection string being used:"
+    echo -e "${PSQL_CONN_STRING}"
+    echo -e "\nTrying to get more error details..."
+    PGSSLMODE=require psql "$PSQL_CONN_STRING" -v ON_ERROR_STOP=1 -X --set AUTOCOMMIT=off -c "SELECT version();"
+    exit 1
 fi
+
+# Update the connection string for all subsequent commands
+PSQL_CONN_STRING="postgresql://postgres:${DB_PASSWORD}@db.${SUPABASE_PROJECT_ID}.supabase.co:5432/postgres?sslmode=require"
 
 # Setup database schema and migrations
 echo -e "\n${BLUE}Setting up database schema and migrations...${NC}"
@@ -531,7 +550,7 @@ CREATE TABLE IF NOT EXISTS auth.users (
 EOL
 )
 
-if echo "$SETUP_AUTH_SQL" | PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -p "$DB_PORT"; then
+if echo "$SETUP_AUTH_SQL" | psql "$PSQL_CONN_STRING"; then
     echo -e "${GREEN}✓ Successfully created auth schema and tables${NC}"
 else
     echo -e "${RED}Failed to create auth schema and tables${NC}"
@@ -573,7 +592,7 @@ END $$;
 EOL
 )
 
-if echo "$INITIAL_MIGRATION" | PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -p "$DB_PORT"; then
+if echo "$INITIAL_MIGRATION" | psql "$PSQL_CONN_STRING"; then
     echo -e "${GREEN}✓ Successfully created initial tables${NC}"
 else
     echo -e "${RED}Failed to create initial tables${NC}"
@@ -626,7 +645,7 @@ CREATE TRIGGER on_auth_user_verified
 EOL
 )
 
-if echo "$AUTH_TRIGGER" | PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -p "$DB_PORT"; then
+if echo "$AUTH_TRIGGER" | psql "$PSQL_CONN_STRING"; then
     echo -e "${GREEN}✓ Successfully set up auth triggers${NC}"
 else
     echo -e "${RED}Failed to set up auth triggers${NC}"
@@ -637,7 +656,7 @@ fi
 echo -e "${BLUE}Revoking public schema access...${NC}"
 REVOKE_ACCESS="REVOKE USAGE ON SCHEMA public FROM anon, authenticated;"
 
-if echo "$REVOKE_ACCESS" | PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -p "$DB_PORT"; then
+if echo "$REVOKE_ACCESS" | psql "$PSQL_CONN_STRING"; then
     echo -e "${GREEN}✓ Successfully revoked public schema access${NC}"
 else
     echo -e "${RED}Failed to revoke public schema access${NC}"
