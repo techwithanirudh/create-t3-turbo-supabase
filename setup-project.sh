@@ -518,6 +518,265 @@ if [ $count -eq $attempts ]; then
     read -r
 fi
 
+# Setup database schema and migrations
+echo -e "\n${BLUE}Setting up database schema and migrations...${NC}"
+
+# Create auth schema and tables if they don't exist
+echo -e "${BLUE}Creating auth schema and tables...${NC}"
+SETUP_AUTH_SQL=$(cat << 'EOL'
+CREATE SCHEMA IF NOT EXISTS auth;
+CREATE TABLE IF NOT EXISTS auth.users (
+    id uuid PRIMARY KEY NOT NULL
+);
+EOL
+)
+
+if echo "$SETUP_AUTH_SQL" | PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -p "$DB_PORT"; then
+    echo -e "${GREEN}✓ Successfully created auth schema and tables${NC}"
+else
+    echo -e "${RED}Failed to create auth schema and tables${NC}"
+    exit 1
+fi
+
+# Create initial tables from migration
+echo -e "${BLUE}Creating initial tables from migration...${NC}"
+INITIAL_MIGRATION=$(cat << 'EOL'
+CREATE TABLE IF NOT EXISTS "t3turbo_profile" (
+    "id" uuid PRIMARY KEY NOT NULL,
+    "name" varchar(256) NOT NULL,
+    "image" varchar(256),
+    "email" varchar(256)
+);
+
+CREATE TABLE IF NOT EXISTS "t3turbo_post" (
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+    "name" varchar(256) NOT NULL,
+    "content" text NOT NULL,
+    "author_id" uuid NOT NULL,
+    "created_at" timestamp DEFAULT now() NOT NULL,
+    "updatedAt" timestamp with time zone
+);
+
+DO $$ BEGIN
+    ALTER TABLE "t3turbo_profile" ADD CONSTRAINT "t3turbo_profile_id_users_id_fk" 
+        FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+DO $$ BEGIN
+    ALTER TABLE "t3turbo_post" ADD CONSTRAINT "t3turbo_post_author_id_t3turbo_profile_id_fk" 
+        FOREIGN KEY ("author_id") REFERENCES "public"."t3turbo_profile"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+EOL
+)
+
+if echo "$INITIAL_MIGRATION" | PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -p "$DB_PORT"; then
+    echo -e "${GREEN}✓ Successfully created initial tables${NC}"
+else
+    echo -e "${RED}Failed to create initial tables${NC}"
+    exit 1
+fi
+
+# Setup auth trigger for new users
+echo -e "${BLUE}Setting up auth trigger for new users...${NC}"
+AUTH_TRIGGER=$(cat << 'EOL'
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  insert into public.t3turbo_profile (id, email, name, image)
+  values (
+    new.id,
+    new.email,
+    COALESCE(
+      new.raw_user_meta_data ->> 'name',
+      new.raw_user_meta_data ->> 'full_name',
+      new.raw_user_meta_data ->> 'user_name',
+      '[redacted]'
+    ),
+    new.raw_user_meta_data ->> 'avatar_url'
+  )
+  on conflict (id) do update set
+    email = excluded.email,
+    name = excluded.name,
+    image = excluded.image;
+  return new;
+end;
+$$;
+
+-- Drop existing triggers if they exist
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP TRIGGER IF EXISTS on_auth_user_verified ON auth.users;
+
+-- Create new triggers
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+CREATE TRIGGER on_auth_user_verified
+    AFTER UPDATE ON auth.users
+    FOR EACH ROW
+    WHEN (old.last_sign_in_at IS NULL AND new.last_sign_in_at IS NOT NULL)
+    EXECUTE PROCEDURE public.handle_new_user();
+EOL
+)
+
+if echo "$AUTH_TRIGGER" | PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -p "$DB_PORT"; then
+    echo -e "${GREEN}✓ Successfully set up auth triggers${NC}"
+else
+    echo -e "${RED}Failed to set up auth triggers${NC}"
+    exit 1
+fi
+
+# Revoke public schema access
+echo -e "${BLUE}Revoking public schema access...${NC}"
+REVOKE_ACCESS="REVOKE USAGE ON SCHEMA public FROM anon, authenticated;"
+
+if echo "$REVOKE_ACCESS" | PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -U "$DB_USER" -d "$DB_NAME" -p "$DB_PORT"; then
+    echo -e "${GREEN}✓ Successfully revoked public schema access${NC}"
+else
+    echo -e "${RED}Failed to revoke public schema access${NC}"
+    exit 1
+fi
+
+# Configure Email and Auth Settings
+echo -e "\n${BLUE}Configuring Email and Auth settings...${NC}"
+
+# Get the access token
+AUTH_TOKEN=$(supabase status --access-token)
+if [ -z "$AUTH_TOKEN" ]; then
+    echo -e "${RED}Failed to get Supabase access token${NC}"
+    exit 1
+fi
+
+# Configure Email Template
+echo -e "${BLUE}Configuring Email Templates...${NC}"
+EMAIL_TEMPLATE_JSON=$(cat << EOF
+{
+  "template": "signup",
+  "subject": "Confirm your signup",
+  "content": {
+    "html": "<h2>Confirm your signup</h2><p>Follow this link to confirm your user:</p><p><a href=\"{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=signup\">Confirm your email</a></p>",
+    "text": "Confirm your signup. Follow this link to confirm your user: {{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=signup"
+  }
+}
+EOF
+)
+
+if ! curl -X PUT \
+    "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_ID}/auth/email-templates/signup" \
+    -H "Authorization: Bearer ${AUTH_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -d "$EMAIL_TEMPLATE_JSON"; then
+    echo -e "${RED}Failed to update email template${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✓ Successfully configured email template${NC}"
+
+# Configure Auth Settings
+echo -e "${BLUE}Configuring Auth Settings...${NC}"
+
+# Get the production URL (using Vercel project URL or default to localhost)
+PRODUCTION_URL="https://${PROJECT_NAME}-${GITHUB_USERNAME}.vercel.app"
+LOCAL_URL="http://localhost:3000"
+
+AUTH_SETTINGS_JSON=$(cat << EOF
+{
+  "site_url": "${PRODUCTION_URL}",
+  "additional_redirect_urls": [
+    "${LOCAL_URL}/**",
+    "https://*-${GITHUB_USERNAME}.vercel.app/**"
+  ]
+}
+EOF
+)
+
+if ! curl -X PUT \
+    "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_ID}/auth/config" \
+    -H "Authorization: Bearer ${AUTH_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -d "$AUTH_SETTINGS_JSON"; then
+    echo -e "${RED}Failed to update auth settings${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✓ Successfully configured auth settings${NC}"
+
+# Configure Auth Providers (GitHub and Apple)
+echo -e "${BLUE}Would you like to configure GitHub authentication? (y/n)${NC}"
+read -r SETUP_GITHUB
+
+if [ "$SETUP_GITHUB" = "y" ]; then
+    echo -e "${BLUE}Please enter your GitHub OAuth Client ID:${NC}"
+    read -r GITHUB_CLIENT_ID
+    echo -e "${BLUE}Please enter your GitHub OAuth Client Secret:${NC}"
+    read -r GITHUB_CLIENT_SECRET
+
+    GITHUB_PROVIDER_JSON=$(cat << EOF
+{
+  "enabled": true,
+  "client_id": "${GITHUB_CLIENT_ID}",
+  "client_secret": "${GITHUB_CLIENT_SECRET}",
+  "redirect_uri": "${PRODUCTION_URL}/auth/callback"
+}
+EOF
+)
+
+    if ! curl -X PUT \
+        "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_ID}/auth/providers/github" \
+        -H "Authorization: Bearer ${AUTH_TOKEN}" \
+        -H "Content-Type: application/json" \
+        -d "$GITHUB_PROVIDER_JSON"; then
+        echo -e "${RED}Failed to configure GitHub provider${NC}"
+        exit 1
+    fi
+
+    echo -e "${GREEN}✓ Successfully configured GitHub authentication${NC}"
+fi
+
+echo -e "${BLUE}Would you like to configure Apple authentication? (y/n)${NC}"
+read -r SETUP_APPLE
+
+if [ "$SETUP_APPLE" = "y" ]; then
+    echo -e "${BLUE}Please enter your Apple Service ID:${NC}"
+    read -r APPLE_SERVICE_ID
+    echo -e "${BLUE}Please enter your Apple Team ID:${NC}"
+    read -r APPLE_TEAM_ID
+    echo -e "${BLUE}Please enter your Apple Key ID:${NC}"
+    read -r APPLE_KEY_ID
+    echo -e "${BLUE}Please enter your Apple Private Key (paste and press Ctrl+D when done):${NC}"
+    APPLE_PRIVATE_KEY=$(cat)
+
+    APPLE_PROVIDER_JSON=$(cat << EOF
+{
+  "enabled": true,
+  "client_id": "${APPLE_SERVICE_ID}",
+  "team_id": "${APPLE_TEAM_ID}",
+  "key_id": "${APPLE_KEY_ID}",
+  "private_key": "${APPLE_PRIVATE_KEY}",
+  "redirect_uri": "${PRODUCTION_URL}/auth/callback"
+}
+EOF
+)
+
+    if ! curl -X PUT \
+        "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_ID}/auth/providers/apple" \
+        -H "Authorization: Bearer ${AUTH_TOKEN}" \
+        -H "Content-Type: application/json" \
+        -d "$APPLE_PROVIDER_JSON"; then
+        echo -e "${RED}Failed to configure Apple provider${NC}"
+        exit 1
+    fi
+
+    echo -e "${GREEN}✓ Successfully configured Apple authentication${NC}"
+fi
+
 # Create Supabase config and link project
 echo -e "${BLUE}Creating Supabase configuration...${NC}"
 CONFIG_DIR="supabase"
