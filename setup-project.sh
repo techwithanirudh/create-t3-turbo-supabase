@@ -99,9 +99,9 @@ set_vercel_env_vars() {
     echo -e "\n${BLUE}Setting environment variables in Vercel...${NC}"
     
     # Construct database URLs
-    local postgres_url="postgresql://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}"
-    local postgres_prisma_url="postgresql://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}?pgbouncer=true&connection_limit=1"
-    local postgres_url_non_pooling="postgresql://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}"
+    local postgres_url="postgres://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}"
+    local postgres_prisma_url="postgres://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}?pgbouncer=true&connection_limit=1"
+    local postgres_url_non_pooling="postgres://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}"
     
     # Set all environment variables
     local vars=(
@@ -473,327 +473,49 @@ fi
 
 echo -e "${GREEN}Successfully created project with ID: ${SUPABASE_PROJECT_ID}${NC}"
 
-# Since we already have access to the project dashboard and API keys,
-# we can skip the waiting period and use default connection values
-echo -e "${BLUE}Setting up database connection details...${NC}"
+# Wait for project to be ready
+echo -e "${BLUE}Waiting for Supabase project to be ready...${NC}"
+echo -e "This may take a few minutes. Checking project status..."
 
-# Get API keys from user
-echo -e "\n${BLUE}Please enter the anon public key from the dashboard:${NC}"
-read -r ANON_KEY
-echo -e "${BLUE}Please enter the service role key from the dashboard:${NC}"
-read -r SERVICE_ROLE_KEY
-echo -e "${BLUE}Please enter the database password from the dashboard:${NC}"
-read -r DB_PASSWORD
-
-if [ -z "$ANON_KEY" ] || [ -z "$SERVICE_ROLE_KEY" ] || [ -z "$DB_PASSWORD" ]; then
-    echo -e "${RED}API keys and database password are required to continue${NC}"
-    exit 1
-fi
-
-# Wait for user confirmation that project is ready
-echo -e "\n${YELLOW}Waiting for Supabase project to be fully ready...${NC}"
-echo -e "Please wait until you see the project is ready in the Supabase dashboard:"
-echo -e "${GREEN}https://supabase.com/dashboard/project/${SUPABASE_PROJECT_ID}${NC}"
-echo -e "Press Enter when the project shows as 'Ready' in the dashboard..."
-read -r
-
-# Verify database connection before proceeding with retries
-echo -e "\n${BLUE}Verifying database connection...${NC}"
-MAX_CONN_RETRIES=5
-CONN_RETRY=0
-CONN_SUCCESS=false
-
-# Construct proper connection string with explicit SSL mode
-PSQL_CONN_STRING="postgresql://postgres:${DB_PASSWORD}@db.${SUPABASE_PROJECT_ID}.supabase.co:5432/postgres?sslmode=require"
-
-while [ $CONN_RETRY -lt $MAX_CONN_RETRIES ] && [ "$CONN_SUCCESS" = false ]; do
-    echo -e "Attempt $((CONN_RETRY + 1)) of ${MAX_CONN_RETRIES}..."
-    # Add -v flag for verbose output to help debug connection issues
-    if PGSSLMODE=require psql "$PSQL_CONN_STRING" -v ON_ERROR_STOP=1 -X --set AUTOCOMMIT=off -c "SELECT version();" > /dev/null 2>&1; then
-        CONN_SUCCESS=true
-        echo -e "${GREEN}✓ Successfully connected to database${NC}"
-    else
-        CONN_RETRY=$((CONN_RETRY + 1))
-        if [ $CONN_RETRY -lt $MAX_CONN_RETRIES ]; then
-            echo -e "${YELLOW}Connection attempt failed. Waiting 15 seconds before retry...${NC}"
-            # Increase wait time to allow for DNS propagation
-            sleep 15
+# Function to check if project is ready
+check_project_ready() {
+    local project_id=$1
+    local status
+    
+    if status=$(supabase projects get --project-ref "$project_id" 2>/dev/null); then
+        if echo "$status" | grep -q '"status": "ACTIVE"'; then
+            return 0
         fi
+    fi
+    return 1
+}
+
+# Wait for project to be ready with timeout
+MAX_WAIT_MINUTES=5
+WAIT_INTERVAL=30
+attempts=$((MAX_WAIT_MINUTES * 60 / WAIT_INTERVAL))
+count=0
+
+while [ $count -lt $attempts ]
+do
+    if check_project_ready "$SUPABASE_PROJECT_ID"; then
+        echo -e "${GREEN}✓ Project is now active${NC}"
+        break
+    fi
+    
+    count=$((count + 1))
+    
+    if [ $count -lt $attempts ]; then
+        echo -e "Project is not ready yet. Waiting ${WAIT_INTERVAL} seconds... (Attempt $count/$attempts)"
+        sleep $WAIT_INTERVAL
     fi
 done
 
-if [ "$CONN_SUCCESS" = false ]; then
-    echo -e "${RED}Could not connect to database after ${MAX_CONN_RETRIES} attempts. Please verify:${NC}"
-    echo -e "1. The project is fully ready in the Supabase dashboard"
-    echo -e "2. The database password is correct"
-    echo -e "3. Wait a few minutes and try again (DNS propagation can take time)"
-    echo -e "\nConnection string being used:"
-    echo -e "${PSQL_CONN_STRING}"
-    echo -e "\nTrying to get more error details..."
-    PGSSLMODE=require psql "$PSQL_CONN_STRING" -v ON_ERROR_STOP=1 -X --set AUTOCOMMIT=off -c "SELECT version();"
-    exit 1
-fi
-
-# Update the connection string for all subsequent commands
-PSQL_CONN_STRING="postgresql://postgres:${DB_PASSWORD}@db.${SUPABASE_PROJECT_ID}.supabase.co:5432/postgres?sslmode=require"
-
-# Setup database schema and migrations
-echo -e "\n${BLUE}Setting up database schema and migrations...${NC}"
-
-# Create auth schema and tables if they don't exist
-echo -e "${BLUE}Creating auth schema and tables...${NC}"
-SETUP_AUTH_SQL=$(cat << 'EOL'
-CREATE SCHEMA IF NOT EXISTS auth;
-CREATE TABLE IF NOT EXISTS auth.users (
-    id uuid PRIMARY KEY NOT NULL
-);
-EOL
-)
-
-if echo "$SETUP_AUTH_SQL" | psql "$PSQL_CONN_STRING"; then
-    echo -e "${GREEN}✓ Successfully created auth schema and tables${NC}"
-else
-    echo -e "${RED}Failed to create auth schema and tables${NC}"
-    exit 1
-fi
-
-# Create initial tables from migration
-echo -e "${BLUE}Creating initial tables from migration...${NC}"
-INITIAL_MIGRATION=$(cat << 'EOL'
-CREATE TABLE IF NOT EXISTS "t3turbo_profile" (
-    "id" uuid PRIMARY KEY NOT NULL,
-    "name" varchar(256) NOT NULL,
-    "image" varchar(256),
-    "email" varchar(256)
-);
-
-CREATE TABLE IF NOT EXISTS "t3turbo_post" (
-    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-    "name" varchar(256) NOT NULL,
-    "content" text NOT NULL,
-    "author_id" uuid NOT NULL,
-    "created_at" timestamp DEFAULT now() NOT NULL,
-    "updatedAt" timestamp with time zone
-);
-
-DO $$ BEGIN
-    ALTER TABLE "t3turbo_profile" ADD CONSTRAINT "t3turbo_profile_id_users_id_fk" 
-        FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
-
-DO $$ BEGIN
-    ALTER TABLE "t3turbo_post" ADD CONSTRAINT "t3turbo_post_author_id_t3turbo_profile_id_fk" 
-        FOREIGN KEY ("author_id") REFERENCES "public"."t3turbo_profile"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
-EOL
-)
-
-if echo "$INITIAL_MIGRATION" | psql "$PSQL_CONN_STRING"; then
-    echo -e "${GREEN}✓ Successfully created initial tables${NC}"
-else
-    echo -e "${RED}Failed to create initial tables${NC}"
-    exit 1
-fi
-
-# Setup auth trigger for new users
-echo -e "${BLUE}Setting up auth trigger for new users...${NC}"
-AUTH_TRIGGER=$(cat << 'EOL'
-create or replace function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer set search_path = public
-as $$
-begin
-  insert into public.t3turbo_profile (id, email, name, image)
-  values (
-    new.id,
-    new.email,
-    COALESCE(
-      new.raw_user_meta_data ->> 'name',
-      new.raw_user_meta_data ->> 'full_name',
-      new.raw_user_meta_data ->> 'user_name',
-      '[redacted]'
-    ),
-    new.raw_user_meta_data ->> 'avatar_url'
-  )
-  on conflict (id) do update set
-    email = excluded.email,
-    name = excluded.name,
-    image = excluded.image;
-  return new;
-end;
-$$;
-
--- Drop existing triggers if they exist
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-DROP TRIGGER IF EXISTS on_auth_user_verified ON auth.users;
-
--- Create new triggers
-CREATE TRIGGER on_auth_user_created
-    AFTER INSERT ON auth.users
-    FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
-
-CREATE TRIGGER on_auth_user_verified
-    AFTER UPDATE ON auth.users
-    FOR EACH ROW
-    WHEN (old.last_sign_in_at IS NULL AND new.last_sign_in_at IS NOT NULL)
-    EXECUTE PROCEDURE public.handle_new_user();
-EOL
-)
-
-if echo "$AUTH_TRIGGER" | psql "$PSQL_CONN_STRING"; then
-    echo -e "${GREEN}✓ Successfully set up auth triggers${NC}"
-else
-    echo -e "${RED}Failed to set up auth triggers${NC}"
-    exit 1
-fi
-
-# Revoke public schema access
-echo -e "${BLUE}Revoking public schema access...${NC}"
-REVOKE_ACCESS="REVOKE USAGE ON SCHEMA public FROM anon, authenticated;"
-
-if echo "$REVOKE_ACCESS" | psql "$PSQL_CONN_STRING"; then
-    echo -e "${GREEN}✓ Successfully revoked public schema access${NC}"
-else
-    echo -e "${RED}Failed to revoke public schema access${NC}"
-    exit 1
-fi
-
-# Configure Email and Auth Settings
-echo -e "\n${BLUE}Configuring Email and Auth settings...${NC}"
-
-# Get the access token
-AUTH_TOKEN=$(supabase status --access-token)
-if [ -z "$AUTH_TOKEN" ]; then
-    echo -e "${RED}Failed to get Supabase access token${NC}"
-    exit 1
-fi
-
-# Configure Email Template
-echo -e "${BLUE}Configuring Email Templates...${NC}"
-EMAIL_TEMPLATE_JSON=$(cat << EOF
-{
-  "template": "signup",
-  "subject": "Confirm your signup",
-  "content": {
-    "html": "<h2>Confirm your signup</h2><p>Follow this link to confirm your user:</p><p><a href=\"{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=signup\">Confirm your email</a></p>",
-    "text": "Confirm your signup. Follow this link to confirm your user: {{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=signup"
-  }
-}
-EOF
-)
-
-if ! curl -X PUT \
-    "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_ID}/auth/email-templates/signup" \
-    -H "Authorization: Bearer ${AUTH_TOKEN}" \
-    -H "Content-Type: application/json" \
-    -d "$EMAIL_TEMPLATE_JSON"; then
-    echo -e "${RED}Failed to update email template${NC}"
-    exit 1
-fi
-
-echo -e "${GREEN}✓ Successfully configured email template${NC}"
-
-# Configure Auth Settings
-echo -e "${BLUE}Configuring Auth Settings...${NC}"
-
-# Get the production URL (using Vercel project URL or default to localhost)
-PRODUCTION_URL="https://${PROJECT_NAME}-${GITHUB_USERNAME}.vercel.app"
-LOCAL_URL="http://localhost:3000"
-
-AUTH_SETTINGS_JSON=$(cat << EOF
-{
-  "site_url": "${PRODUCTION_URL}",
-  "additional_redirect_urls": [
-    "${LOCAL_URL}/**",
-    "https://*-${GITHUB_USERNAME}.vercel.app/**"
-  ]
-}
-EOF
-)
-
-if ! curl -X PUT \
-    "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_ID}/auth/config" \
-    -H "Authorization: Bearer ${AUTH_TOKEN}" \
-    -H "Content-Type: application/json" \
-    -d "$AUTH_SETTINGS_JSON"; then
-    echo -e "${RED}Failed to update auth settings${NC}"
-    exit 1
-fi
-
-echo -e "${GREEN}✓ Successfully configured auth settings${NC}"
-
-# Configure Auth Providers (GitHub and Apple)
-echo -e "${BLUE}Would you like to configure GitHub authentication? (y/n)${NC}"
-read -r SETUP_GITHUB
-
-if [ "$SETUP_GITHUB" = "y" ]; then
-    echo -e "${BLUE}Please enter your GitHub OAuth Client ID:${NC}"
-    read -r GITHUB_CLIENT_ID
-    echo -e "${BLUE}Please enter your GitHub OAuth Client Secret:${NC}"
-    read -r GITHUB_CLIENT_SECRET
-
-    GITHUB_PROVIDER_JSON=$(cat << EOF
-{
-  "enabled": true,
-  "client_id": "${GITHUB_CLIENT_ID}",
-  "client_secret": "${GITHUB_CLIENT_SECRET}",
-  "redirect_uri": "${PRODUCTION_URL}/auth/callback"
-}
-EOF
-)
-
-    if ! curl -X PUT \
-        "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_ID}/auth/providers/github" \
-        -H "Authorization: Bearer ${AUTH_TOKEN}" \
-        -H "Content-Type: application/json" \
-        -d "$GITHUB_PROVIDER_JSON"; then
-        echo -e "${RED}Failed to configure GitHub provider${NC}"
-        exit 1
-    fi
-
-    echo -e "${GREEN}✓ Successfully configured GitHub authentication${NC}"
-fi
-
-echo -e "${BLUE}Would you like to configure Apple authentication? (y/n)${NC}"
-read -r SETUP_APPLE
-
-if [ "$SETUP_APPLE" = "y" ]; then
-    echo -e "${BLUE}Please enter your Apple Service ID:${NC}"
-    read -r APPLE_SERVICE_ID
-    echo -e "${BLUE}Please enter your Apple Team ID:${NC}"
-    read -r APPLE_TEAM_ID
-    echo -e "${BLUE}Please enter your Apple Key ID:${NC}"
-    read -r APPLE_KEY_ID
-    echo -e "${BLUE}Please enter your Apple Private Key (paste and press Ctrl+D when done):${NC}"
-    APPLE_PRIVATE_KEY=$(cat)
-
-    APPLE_PROVIDER_JSON=$(cat << EOF
-{
-  "enabled": true,
-  "client_id": "${APPLE_SERVICE_ID}",
-  "team_id": "${APPLE_TEAM_ID}",
-  "key_id": "${APPLE_KEY_ID}",
-  "private_key": "${APPLE_PRIVATE_KEY}",
-  "redirect_uri": "${PRODUCTION_URL}/auth/callback"
-}
-EOF
-)
-
-    if ! curl -X PUT \
-        "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_ID}/auth/providers/apple" \
-        -H "Authorization: Bearer ${AUTH_TOKEN}" \
-        -H "Content-Type: application/json" \
-        -d "$APPLE_PROVIDER_JSON"; then
-        echo -e "${RED}Failed to configure Apple provider${NC}"
-        exit 1
-    fi
-
-    echo -e "${GREEN}✓ Successfully configured Apple authentication${NC}"
+if [ $count -eq $attempts ]; then
+    echo -e "${YELLOW}Project creation is taking longer than expected.${NC}"
+    echo -e "Please check the status at: ${GREEN}https://supabase.com/dashboard/project/${SUPABASE_PROJECT_ID}${NC}"
+    echo -e "Press Enter when the project shows as 'Active' in the dashboard..."
+    read -r
 fi
 
 # Create Supabase config and link project
