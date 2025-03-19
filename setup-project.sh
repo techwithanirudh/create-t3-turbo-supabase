@@ -518,33 +518,6 @@ if [ $count -eq $attempts ]; then
     read -r
 fi
 
-# Create Supabase config and link project
-echo -e "${BLUE}Creating Supabase configuration...${NC}"
-CONFIG_DIR="supabase"
-mkdir -p "$CONFIG_DIR"
-
-# Create config.toml with proper auth configuration
-cat > "${CONFIG_DIR}/config.toml" << EOL
-project_id = "${SUPABASE_PROJECT_ID}"
-
-[auth]
-enabled = true
-site_url = "http://localhost:3000"
-additional_redirect_urls = []
-jwt_expiry = 3600
-enable_refresh_token_rotation = true
-refresh_token_reuse_interval = 10
-
-[auth.email]
-enable_signup = true
-double_confirm_changes = true
-enable_confirmations = true
-secure_password_change = false
-max_frequency = "1m0s"
-otp_length = 6
-otp_expiry = 3600
-EOL
-
 # Link Supabase project with retries
 echo -e "${BLUE}Linking Supabase project...${NC}"
 MAX_LINK_RETRIES=3
