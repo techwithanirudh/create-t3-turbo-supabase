@@ -695,29 +695,68 @@ fi
 # Configure Vercel project settings
 echo -e "\n${BLUE}Configuring Vercel project settings...${NC}"
 
-# Set root directory
-if ! vercel project settings rootDirectory "apps/nextjs"; then
+# Set root directory and other settings using vercel project settings set
+if ! vercel project settings set rootDirectory "apps/nextjs"; then
     echo -e "${YELLOW}Warning: Failed to set root directory${NC}"
 fi
 
 # Set framework preset
-if ! vercel project settings framework nextjs; then
+if ! vercel project settings set framework nextjs; then
     echo -e "${YELLOW}Warning: Failed to set framework settings${NC}"
 fi
 
 # Set build command for monorepo
-if ! vercel project settings buildCommand "cd ../.. && pnpm install && pnpm turbo run build --filter=@acme/nextjs..."; then
+if ! vercel project settings set buildCommand "cd ../.. && pnpm install && pnpm turbo run build --filter=@acme/nextjs..."; then
     echo -e "${YELLOW}Warning: Failed to set build command${NC}"
 fi
 
 # Set output directory
-if ! vercel project settings outputDirectory ".next"; then
+if ! vercel project settings set outputDirectory ".next"; then
     echo -e "${YELLOW}Warning: Failed to set output directory${NC}"
 fi
 
 # Set install command
-if ! vercel project settings installCommand "pnpm install"; then
+if ! vercel project settings set installCommand "pnpm install"; then
     echo -e "${YELLOW}Warning: Failed to set install command${NC}"
+fi
+
+# Pull environment variables from Vercel with retries
+echo -e "\n${BLUE}Pulling environment variables from Vercel...${NC}"
+MAX_ENV_RETRIES=3
+ENV_RETRY=0
+ENV_SUCCESS=false
+
+while [ $ENV_RETRY -lt $MAX_ENV_RETRIES ] && [ "$ENV_SUCCESS" = false ]; do
+    if vercel env pull .env --yes; then
+        # Verify that the .env file is not empty and contains our expected variables
+        if [ -s .env ] && grep -q "NEXT_PUBLIC_SUPABASE_URL" .env; then
+            ENV_SUCCESS=true
+            echo -e "${GREEN}✓ Successfully pulled environment variables${NC}"
+        else
+            echo -e "${YELLOW}Environment file appears to be empty or missing critical variables${NC}"
+            # Force pull with environment specification
+            if vercel env pull .env --environment=production --yes; then
+                if [ -s .env ] && grep -q "NEXT_PUBLIC_SUPABASE_URL" .env; then
+                    ENV_SUCCESS=true
+                    echo -e "${GREEN}✓ Successfully pulled environment variables on second attempt${NC}"
+                fi
+            fi
+        fi
+    fi
+    
+    if [ "$ENV_SUCCESS" = false ]; then
+        ENV_RETRY=$((ENV_RETRY + 1))
+        if [ $ENV_RETRY -lt $MAX_ENV_RETRIES ]; then
+            echo -e "${YELLOW}Retry $ENV_RETRY: Waiting before next attempt...${NC}"
+            sleep 10
+        fi
+    fi
+done
+
+if [ "$ENV_SUCCESS" = false ]; then
+    echo -e "${RED}Warning: Could not verify environment variables were pulled correctly${NC}"
+    echo -e "${YELLOW}Please check your Vercel project settings and ensure environment variables are set${NC}"
+    echo -e "${YELLOW}You may need to manually copy environment variables after setup${NC}"
 fi
 
 # Deploy to Vercel
