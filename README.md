@@ -121,6 +121,45 @@ After running the setup script, you'll need to:
    - Post table with relationships
    - Necessary triggers for user management
 
+### 3. Development Workflow
+
+For local development with Supabase:
+
+1. **Switch to Local Environment**
+
+   ```bash
+   # Create local .env from example
+   cp .env.example .env
+
+   # Get your local credentials
+   supabase start
+   supabase status
+
+   # Update .env with local credentials
+   # See "Environment Configuration" section below
+   ```
+
+2. **Apply Migrations Locally**
+
+   ```bash
+   pnpm db:migrate
+   ```
+
+3. **Develop and Test Locally**
+
+   ```bash
+   pnpm dev
+   ```
+
+4. **Deploy to Production**
+
+   ```bash
+   # Commit and push your changes
+   git push origin main
+
+   # Vercel will automatically deploy and run migrations
+   ```
+
 ## Database Development Workflow
 
 ### 1. Making Schema Changes
@@ -191,138 +230,13 @@ git add packages/db/src/schema/
 git commit -m "feat(db): add new feature table"
 ```
 
-## Best Practices
-
-### Schema Development
-
-1. **Table Naming**
-
-   ```typescript
-   // DO: Use t3turbo_ prefix (configured in drizzle.config.ts)
-   export const feature = pgTable("t3turbo_feature", {
-     // ...
-   });
-   ```
-
-2. **Relationships**
-
-   ```typescript
-   // DO: Use type-safe references
-   authorId: uuid("author_id").references(() => profile.id, {
-     onDelete: "cascade",  // Specify behavior
-   }),
-   ```
-
-3. **Migrations**
-   ```typescript
-   // DON'T: Modify existing migrations
-   // DO: Create new migrations for changes
-   // DO: Keep migrations focused and atomic
-   ```
-
-### Production Deployment
-
-1. **Migration Process**
-
-   ```bash
-   # 1. Generate migration locally
-   pnpm db:generate
-
-   # 2. Test locally
-   pnpm db:migrate
-
-   # 3. Commit and push
-   git push origin main
-
-   # 4. Vercel will automatically run migrations
-   # (configured in build settings)
-   ```
-
-2. **Rollback Strategy**
-
-   ```bash
-   # 1. Create rollback migration
-   pnpm db:generate --rollback
-
-   # 2. Test rollback locally
-   pnpm db:migrate
-
-   # 3. If needed in production, deploy rollback
-   vercel deploy
-   ```
-
-### Local Development
-
-1. **Database Commands**
-
-   ```bash
-   # Generate migration
-   pnpm db:generate
-
-   # Apply migrations
-   pnpm db:migrate
-
-   # View database
-   pnpm db:studio
-
-   # Push schema (development only)
-   pnpm db:push
-   ```
-
-2. **Type Generation**
-   ```typescript
-   // Types are automatically generated from your schema
-   import { type Post } from "@acme/db/schema";
-   ```
-
-## Troubleshooting
-
-If you encounter issues:
-
-1. **Environment Variables**
-
-   - Verify all variables in `.env`
-   - Check Vercel project settings
-   - Ensure Supabase connection strings are correct
-
-2. **Database Issues**
-
-   - Verify Supabase project is active
-   - Check database triggers are properly set up
-   - Ensure schema migrations are applied
-
-3. **Auth Problems**
-
-   - Verify auth provider configuration
-   - Check redirect URLs in Supabase
-   - Ensure proper API keys are set
-
-4. **Migration Issues**
-
-   ```bash
-   # Check migration status
-   pnpm db:migrate status
-
-   # Reset database (development only)
-   pnpm db:migrate reset
-
-   # View migration logs
-   cat packages/db/migrations/meta/_journal.json
-   ```
-
-5. **Schema Sync Issues**
-
-   ```bash
-   # Compare schemas
-   pnpm db:generate --dry-run
-
-   # Check for drift
-   pnpm db:migrate check
-   ```
-
-For more help, check the [issues](https://github.com/t3-oss/create-t3-turbo/issues) or create a new one.
-
 ## Development
+
+> **Prerequisites:**
+>
+> - Node.js and pnpm installed
+> - Docker installed and running (required for local Supabase)
+> - Supabase CLI installed (`brew install supabase/tap/supabase`)
 
 ### Local Supabase Setup
 
@@ -344,6 +258,8 @@ For more help, check the [issues](https://github.com/t3-oss/create-t3-turbo/issu
    - Storage API
    - Edge Functions support
 
+   > **Note:** Local Supabase requires Docker to be installed and running.
+
 2. **Update Environment Variables**
 
    ```bash
@@ -363,6 +279,73 @@ For more help, check the [issues](https://github.com/t3-oss/create-t3-turbo/issu
    pnpm db:migrate
    ```
 
+### Environment Configuration
+
+After running the initial setup script, your `.env` file will contain production environment variables fetched from Vercel. To switch between production and local development:
+
+1. **Production vs. Local Environment**
+
+   - **Production:** Uses the Vercel-fetched environment variables
+   - **Local:** Requires updating `.env` to point to your local Supabase instance
+
+2. **Switching to Local Development**
+
+   ```bash
+   # Copy the example env file
+   cp .env.example .env
+
+   # Start local Supabase (requires Docker)
+   supabase start
+
+   # Fill in missing values from your local Supabase instance
+   # You can find these values by running:
+   supabase status
+   ```
+
+3. **Required Local Environment Variables**
+
+   After starting Supabase locally for the first time, you'll need to update:
+
+   ```
+   NEXT_PUBLIC_SUPABASE_ANON_KEY="sbp_..."      # From supabase status output
+   SUPABASE_SERVICE_ROLE_KEY="eyJ..."           # From supabase status output
+   SUPABASE_JWT_SECRET="super-secret-jwt..."    # From supabase status output
+   SUPABASE_ANON_KEY="sbp_..."                  # Same as NEXT_PUBLIC_SUPABASE_ANON_KEY
+   ```
+
+4. **Apply Initial Migration**
+
+   After setting up your local environment, apply the initial migration:
+
+   ```bash
+   pnpm db:migrate
+   ```
+
+   This creates and populates the necessary database tables in your local Supabase instance.
+
+5. **Verifying Configuration**
+
+   ```bash
+   # Check that you're pointing to the correct environment
+   grep NEXT_PUBLIC_SUPABASE_URL .env
+
+   # Should show local URL for local development:
+   # NEXT_PUBLIC_SUPABASE_URL="http://127.0.0.1:54321"
+   ```
+
+6. **Complete Development Workflow**
+
+   The typical development workflow is:
+
+   1. Develop and test with local Supabase
+   2. Generate migrations for schema changes
+   3. Apply and test migrations locally
+   4. Commit changes, including migration files
+   5. Push to GitHub
+   6. Vercel automatically deploys and applies migrations to production
+
+   > **Note:** Always test migrations locally before deploying to production
+
 ### Development Workflow
 
 1. **Start Development Servers**
@@ -375,6 +358,14 @@ For more help, check the [issues](https://github.com/t3-oss/create-t3-turbo/issu
    pnpm dev:web     # Next.js only
    pnpm dev:mobile  # Expo only
    ```
+
+   When you run `pnpm dev`, Turbo uses the `.env` file to provide environment variables to all packages and apps in the monorepo. The `dev` script in the root package.json runs `turbo watch dev`, which:
+
+   - Watches for changes across all packages
+   - Starts the development servers for all apps
+   - In the `@acme/db` package, it runs `supabase start` to ensure the local Supabase instance is running
+
+   > **Note:** Make sure Docker is running before starting the development servers, as the local Supabase instance requires it.
 
 2. **Local Database Management**
 
@@ -394,6 +385,7 @@ For more help, check the [issues](https://github.com/t3-oss/create-t3-turbo/issu
 
    # Use remote Supabase (production)
    supabase stop
+   # Then update .env to use production URLs and keys
    ```
 
 ### Development Scripts
@@ -409,6 +401,25 @@ Available commands in `package.json`:
     "with-env": "dotenv -e .env --"
   }
 }
+```
+
+The `with-env` script uses `dotenv` to load environment variables from the `.env` file before running the actual command. When you run `pnpm dev`, it:
+
+1. Loads all environment variables from `.env`
+2. Makes them available to all packages and apps in the monorepo
+3. Runs `turbo watch dev` which watches for changes and runs dev servers
+
+After the initial setup, the `.env` file will contain production environment variables pulled from Vercel. To use local development environment instead:
+
+```bash
+# 1. Copy example environment file
+cp .env.example .env
+
+# 2. Update with your local Supabase credentials
+# (from supabase status command)
+
+# 3. Run development server with local environment variables
+pnpm dev
 ```
 
 ### Local Development Best Practices
@@ -533,3 +544,52 @@ For iOS development, Apple Sign-In is required if you're using any third-party a
 supabase local dev env http://127.0.0.1:54323/
 local inmail http://127.0.0.1:54324/
 local front http://localhost:3000/
+
+### Production Deployment
+
+1. **Migration Process**
+
+   ```bash
+   # 1. Generate migration locally
+   pnpm db:generate
+
+   # 2. Test locally
+   pnpm db:migrate
+
+   # 3. Commit and push
+   git add packages/db/migrations/
+   git add packages/db/src/schema/
+   git commit -m "feat(db): add new feature table"
+   git push origin main
+
+   # 4. Vercel will automatically run migrations during deployment
+   # (migrations are configured to run in the build step)
+   ```
+
+   When you push to GitHub, Vercel will:
+
+   1. Detect the changes
+   2. Start a new deployment
+   3. Run the build command which includes applying migrations
+   4. Deploy the new version with updated database schema
+
+2. **Rollback Strategy**
+
+   If you need to rollback a migration in production:
+
+   ```bash
+   # 1. Create rollback migration
+   pnpm db:generate --rollback
+
+   # 2. Test rollback locally
+   pnpm db:migrate
+
+   # 3. Commit and push rollback migration
+   git add packages/db/migrations/
+   git commit -m "fix(db): rollback problematic migration"
+   git push origin main
+
+   # 4. Vercel will deploy and apply the rollback
+   ```
+
+   > **Important:** Always test rollbacks locally before deploying to production

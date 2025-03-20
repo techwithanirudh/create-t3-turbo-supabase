@@ -22,11 +22,13 @@
     "typecheck": "turbo run typecheck",
     "ui-add": "turbo run ui-add",
     "prepare": "husky",
-    "pre-commit": "./scripts/pre-commit.sh"
+    "pre-commit": "./scripts/pre-commit.sh",
+    "db:migrate": "turbo -F @acme/db migrate"
   },
   "devDependencies": {
     "@acme/prettier-config": "workspace:*",
     "@turbo/gen": "^2.0.6",
+    "dotenv": "^16.4.7",
     "husky": "^9.1.7",
     "prettier": "^3.3.2",
     "turbo": "^2.0.6",
