@@ -21,7 +21,8 @@
     "postinstall": "pnpm lint:ws",
     "typecheck": "turbo run typecheck",
     "ui-add": "turbo run ui-add",
-    "prepare": "husky"
+    "prepare": "husky",
+    "pre-commit": "./scripts/pre-commit.sh"
   },
   "devDependencies": {
     "@acme/prettier-config": "workspace:*",
