@@ -529,3 +529,7 @@ For iOS development, Apple Sign-In is required if you're using any third-party a
 3. Create a PR
 4. Ensure CI passes
 5. Get approval and merge
+
+supabase local dev env http://127.0.0.1:54323/
+local inmail http://127.0.0.1:54324/
+local front http://localhost:3000/
