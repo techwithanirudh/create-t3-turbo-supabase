@@ -593,3 +593,682 @@ local front http://localhost:3000/
    ```
 
    > **Important:** Always test rollbacks locally before deploying to production
+
+   https://git-scm.com/doc
+
+https://vercel.com/docs
+
+https://docs.cursor.com/context/@-symbols/@-docs
+
+https://docs.github.com/en
+
+https://orm.drizzle.team/docs/kit-overview
+
+https://supabase.com/docs
+
+https://turbo.build/repo/docs
+
+https://docs.expo.dev/
+
+https://docs.expo.dev/eas/
+
+https://nextjs.org/docs/14/getting-started
+
+https://trpc.io/docs/
+
+https://ui.shadcn.com/docs
+
+https://tanstack.com/
+
+https://typicode.github.io/husky/
+
+https://eslint.org/docs/latest/
+
+https://pnpm.io/motivation
+
+https://prettier.io/docs/
+
+https://nodejs.org/docs/latest/api/
+
+https://www.dotenv.org/docs/
+
+https://react.dev/learn
+
+https://github.com/pedromshin/create-turbo-stack
+
+https://github.com/techwithanirudh/create-t3-turbo-supabase/
+
+https://github.com/t3-oss/create-t3-turbo
+
+https://github.com/t3-oss/create-t3-app
+
+This guide explains how our tech stack works. We'll break down complex concepts to help you understand what's happening "under the hood" of our application.
+
+## **Understanding Where Code Runs**
+
+Before diving into the specific technologies, it's crucial to understand _where_ our code actually runs - meaning on which physical computer processor (CPU).
+
+### **Computers Are Everywhere**
+
+Servers, mobile phones, laptops, and even smart TVs are all fundamentally computers. They all have:
+
+- CPUs (processors) that execute code
+- Memory to store data
+- Operating systems that manage resources
+
+However, these devices are optimized for different purposes:
+
+- **Servers**: Optimized for reliability, handling many users simultaneously, and running 24/7
+- **Mobile Devices**: Optimized for battery life, touch interfaces, and portable use
+- **Desktop/Laptops**: Optimized for general-purpose computing with keyboard/mouse input
+- **Browsers**: Run within other operating systems but have their own rules and limitations
+
+### **Adapting Code for Different Environments**
+
+Even though JavaScript was originally designed for browsers, modern tools allow us to:
+
+1. Write code once
+2. Adapt it automatically for different environments
+3. Run it almost anywhere
+
+This requires special consideration for each platform:
+
+- **iOS**: Requires Apple-approved code and specific UI patterns
+- **Android**: Has its own set of UI components and permissions
+- **Windows/macOS/Linux**: Each has different file systems and native capabilities
+- **Browsers**: Limited by security restrictions and what browsers support
+
+### **Client vs. Server: Who's Doing the Work?**
+
+In our application:
+
+- **Client-side code** runs on the user's device (in their hands or on their desk):
+  - The web browser on their computer
+  - The mobile app on their phone/tablet
+  - This uses the user's own CPU and resources
+- **Server-side code** runs on computers in data centers (far away from users):
+  - These are typically powerful machines optimized for performance
+  - They handle requests from many clients simultaneously
+  - They connect to databases and other services
+  - They're maintained by specialized teams or cloud providers
+
+The distinction matters because:
+
+1. **Security**: Sensitive operations must happen on servers where users can't access or modify the code
+2. **Performance**: Heavy tasks should be on servers with more resources, while responsive UI elements should be on clients
+3. **Battery life**: Mobile apps need to be careful about how much processing they do
+4. **Data privacy**: You need to be mindful of what data is stored where
+
+Now, let's dive into the specific technologies that make this all work together seamlessly.
+
+## **0. Core Concepts**
+
+### **What is Node.js?**
+
+Node.js is a platform that allows JavaScript (traditionally a browser-only language) to run on servers and computers. Think of it as the engine that powers our application behind the scenes.
+
+### **Code Environments: Browser vs Server vs Mobile**
+
+Our application runs in three different environments:
+
+1. **Browser Code**: This is what users see and interact with in their web browsers. It runs on the user's device.
+2. **Server Code**: This runs on our servers, handling tasks like database operations and business logic.
+3. **Mobile Native Code**: Our JavaScript code is compiled into native code that runs on iOS and Android devices.
+
+### **Local vs Production**
+
+- **Local Development**: When developers work on their computers, they run a "local" version of the application that only they can see and test.
+- **Production**: This is the live version that users interact with.
+
+### **Deployment Process**
+
+When a developer completes work:
+
+1. They "commit" their changes (save them to the code history)
+2. They "push" their changes to GitHub (our code storage)
+3. Automatic systems deploy these changes:
+   - **Vercel** deploys the web application
+   - **Expo** builds and publishes mobile app updates
+
+### **Package.json: The Project Blueprint**
+
+This is like the "recipe book" for our application:
+
+- It lists all the ingredients (dependencies) our app needs
+- It defines the commands (scripts) to run the app
+- It specifies which version of Node.js to use
+
+**Dependencies vs DevDependencies**:
+
+- **Dependencies**: Required for the app to run (like ingredients in a cake)
+- **DevDependencies**: Only needed for development (like baking tools - not in the final cake)
+
+### **Monorepo: One Repository, Multiple Projects**
+
+Our application uses a "monorepo" structure, which means we keep multiple related projects in a single repository:
+
+**Advantages**:
+
+- **Shared Code**: Teams can easily share and reuse code
+- **Consistency**: Ensures all parts of the app use the same tools and versions
+- **Simplified Workflow**: Easier to make changes that affect multiple parts of the app
+
+**Disadvantages**:
+
+- **Complexity**: More complex to set up and maintain
+- **Size**: The repository can become large
+- **Learning Curve**: Takes time for new developers to understand
+
+### **Environment Variables and Security**
+
+Environment variables are like secret keys that the application needs to function but shouldn't be shared publicly. They're kept in `.env files.
+
+**Security Importance**:
+
+- They contain sensitive information like database passwords and API keys
+- They're different between local development and production
+- They're excluded from code repositories for security reasons
+- NEVER commit `.env files to GitHub!
+
+## **1. Development Workflows**
+
+### **Linting**
+
+Linting is like spell-check for code. It automatically checks for:
+
+- Potential errors and bugs
+- Code style inconsistencies
+- Best practice violations
+
+In our project, we use **ESLint** to enforce code quality standards.
+
+### **Formatting**
+
+Code formatting ensures all code looks consistent regardless of who wrote it. Think of it as ensuring all documents use the same font, margins, and spacing.
+
+We use **Prettier** to automatically format our code.
+
+### **Type Checking**
+
+Type checking helps catch errors before the application runs by ensuring data is of the expected type. It's like making sure you don't accidentally put letters in a field that expects only numbers.
+
+**TypeScript** provides this functionality for our JavaScript code.
+
+### **Building**
+
+Building is the process of converting human-readable code into optimized files that computers can run efficiently. It's like taking raw ingredients and cooking them into a meal.
+
+Our build process:
+
+1. Checks for errors
+2. Compiles TypeScript to JavaScript
+3. Bundles all code together
+4. Optimizes for performance
+
+### **Husky Pre-commit Hooks**
+
+Husky is like a guard dog that checks your code before allowing you to commit it:
+
+- It runs linting, formatting, and tests
+- It can block commits if issues are found
+- It ensures only quality code enters the repository
+
+### **Testing**
+
+Testing verifies that the application works as expected by automatically checking functionality. It's like quality control in manufacturing.
+
+## **2. Routing**
+
+### **Next.js File-Based Routing**
+
+In our web application, page URLs are determined by the file structure:
+
+- Files in `app/page.tsx` correspond to `/` (homepage)
+- Files in `app/about/page.tsx` correspond to `/about`
+- Files in `app/blog/[slug]/page.tsx` correspond to dynamic routes like `/blog/my-post`
+
+### **Expo Navigation**
+
+Mobile apps don't use URLs like websites. Instead, they use a navigation system:
+
+- Screens are defined in files
+- Navigation between screens is handled by a navigation library
+
+### **Why File/Folder Names Matter**
+
+The structure and naming of files and folders directly determine:
+
+- The URL structure of the web application
+- How screens connect in the mobile app
+- How components are organized and imported
+
+## **3. Project Structure: Packages vs Apps**
+
+Our monorepo contains two main types of directories:
+
+### **Apps**
+
+"Apps" are complete applications that users interact with directly:
+
+- `apps/nextjs`: Our web application built with Next.js
+- `apps/expo`: Our mobile application built with Expo/React Native
+
+### **Packages**
+
+"Packages" are shared libraries used by multiple apps:
+
+- `packages/api`: Contains API endpoints and services
+- `packages/db`: Handles database connections and models
+- `packages/ui`: Contains shared UI components
+- `packages/validators`: Contains data validation logic
+
+This structure allows us to:
+
+- Write code once and use it in both web and mobile apps
+- Maintain consistency across platforms
+- Make changes to shared functionality in one place
+
+## **4. Database Integration**
+
+### **Supabase Overview**
+
+Supabase is our "backend as a service" platform that provides:
+
+- **Database**: PostgreSQL database to store application data
+- **Authentication**: User sign-up and login functionality
+- **Storage**: File storage for images and documents
+- **Realtime**: Live updates for collaborative features
+
+Think of Supabase as the foundation that stores and manages all our data.
+
+### **Drizzle ORM**
+
+Drizzle is a tool that helps us interact with the database safely:
+
+- It provides a structured way to define database tables
+- It ensures type safety when querying the database
+- It helps prevent common security issues like SQL injection
+
+### **Migrations**
+
+Database migrations are like version control for your database structure:
+
+- They track changes to the database schema over time
+- They can be applied and rolled back if needed
+- They ensure consistent database structure across environments
+
+## **5. DB Package**
+
+The `packages/db` package is responsible for:
+
+- Defining the structure of our database tables
+- Providing a consistent way to connect to the database
+- Managing database migrations
+- Offering utility functions for common database operations
+
+It acts as the single source of truth for our data structure, ensuring all parts of the application have a consistent understanding of how data is organized.
+
+## **6. Local Development with Supabase**
+
+### **Docker Requirements**
+
+Supabase requires Docker to run locally, which provides isolated containers for all Supabase services:
+
+- **PostgreSQL**: The database engine
+- **PostgREST**: API for accessing PostgreSQL directly
+- **GoTrue**: Authentication service
+- **Realtime**: WebSocket-based real-time functionality
+- **Storage**: Object storage service
+
+Before starting local development:
+
+1. **Install Docker**: Download and install Docker Desktop from [docker.com](https://www.docker.com/products/docker-desktop/)
+2. **Verify Docker**: Ensure Docker is running with `docker --version`
+3. **Configure Resources**: Allocate sufficient memory (at least 4GB) to Docker
+
+### **Starting the Local Supabase Instance**
+
+To start Supabase locally:
+
+```bash
+pnpm dev
+```
+
+This runs the `npx supabase start` command with your environment variables loaded, which:
+
+1. Downloads required Docker images if necessary
+2. Starts all Supabase services
+3. Creates a local database
+4. Applies any existing migrations
+5. Provides local service URLs
+
+### **Data Models and Schema**
+
+Our data models are defined using Drizzle ORM in the `packages/db/src/schema` directory:
+
+- Each file defines one or more related tables
+- Tables are created using `createTable()` from `./_table.ts`
+- Relations between tables are explicitly defined
+- Zod validation schemas are generated for type-safe data insertion
+
+**Example Model Structure**:
+
+```typescript
+// Define the table structure
+export const Post = createTable("post", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: varchar("name", { length: 256 }).notNull(),
+  content: text("content").notNull(),
+  authorId: uuid("author_id")
+    .notNull()
+    .references(() => Profile.id),
+  // Timestamps
+  createdAt: timestamp("created_at")
+    .default(sql`now()`)
+    .notNull(),
+  updatedAt: timestamp("updatedAt").$onUpdateFn(() => sql`now()`),
+});
+
+// Define relationships
+export const PostRelations = relations(Post, ({ one }) => ({
+  author: one(Profile, { fields: [Post.authorId], references: [Profile.id] }),
+}));
+
+// Generate validation schema
+export const CreatePostSchema = createInsertSchema(Post, {
+  title: z.string().max(256),
+  content: z.string().max(256),
+}).omit({
+  id: true,
+  authorId: true,
+  ...timestamps,
+});
+```
+
+### **Supabase Authentication Integration**
+
+Supabase provides a complete authentication system that our application leverages:
+
+- **Auth Schema**: Supabase creates a separate `auth` schema in the database
+  - Contains tables for users, sessions, factors, etc.
+  - Managed internally by Supabase (don't modify directly)
+- **Auth-Database Integration**: Our application uses the authenticated user's ID to link to our custom models
+
+  - The `Profile` table typically has a foreign key reference to `auth.users`
+  - This creates a one-to-one relationship between auth users and application profiles
+
+- **Row-Level Security (RLS)**: Supabase uses PostgreSQL's RLS to control data access
+
+  - Policies define who can read, create, update, or delete rows
+  - Based on the authenticated user's ID and role
+  - Defined in SQL and can be managed through Supabase's interface
+
+- **Auth Hooks**: The application can react to authentication events
+
+  - Sign-up triggers can create initial user data
+  - Sign-in can update user activity
+
+- **Multiple Auth Methods**:
+  - Email/password authentication
+  - Magic link (passwordless) authentication
+  - OAuth providers (Google, GitHub, etc.)
+  - Phone authentication
+
+**Example Profile Schema with Auth Integration**:
+
+```typescript
+// In profile.ts
+export const Profile = createTable("profile", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references("auth.users(id)"), // References Supabase auth user
+  name: varchar("name", { length: 100 }),
+  email: varchar("email", { length: 100 }).notNull(),
+  imageUrl: varchar("image_url", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+```
+
+### **Understanding Migrations**
+
+Migrations are SQL files that track changes to your database schema:
+
+- Located in `packages/db/migrations/`
+- Named with a timestamp and description (e.g. `0000_right_karnak.sql`)
+- Generated automatically by Drizzle Kit
+- Applied in sequential order
+- Tracked in the `_drizzle_migrations` table
+
+### **Database Change Workflow**
+
+When modifying the database structure:
+
+1. **Update Schema Files**: Modify or create files in `packages/db/src/schema/`
+2. **Generate Migration**: Run `pnpm db:migrate` to create a migration file
+3. **Review Migration**: Check the generated SQL in the migration file
+4. **Apply Migration Locally**: The migration is automatically applied to your local database
+5. **Test Changes**: Ensure your application works with the new structure
+6. **Commit Changes**: Commit both schema files and migration files
+
+### **Pushing Changes to Production**
+
+To deploy database changes to production:
+
+1. **Merge to Main**: Merge your changes to the main branch
+2. **CI/CD Pipeline**: Your CI/CD pipeline will:
+   - Run the migration scripts against the production database
+   - Deploy the updated application code
+3. **Monitoring**: Watch for any errors during the migration process
+
+### **Common Database Commands**
+
+- `pnpm dev`: Start all services including local Supabase instance
+- `pnpm db:migrate`: Generate and apply migrations
+- `pnpm db:push`: Push schema changes directly (for development only)
+- `pnpm db:studio`: Open Drizzle Studio to browse and edit data
+
+### **Handling Migration Conflicts**
+
+If multiple developers make schema changes:
+
+1. **Pull Latest Changes**: Ensure you have the latest migrations
+2. **Resolve Conflicts**: Manually merge conflicting migration files
+3. **Regenerate Migration**: If needed, reset and regenerate your migration
+4. **Test Thoroughly**: Verify that the merged migrations work correctly
+
+### **Best Practices for Schema Changes**
+
+- **Make Small, Focused Changes**: Easier to review and less risky
+- **Backward Compatibility**: When possible, make additive changes
+- **Add, Then Remove**: For renames or restructures, add new columns before removing old ones
+- **Test Data Migration**: Test with realistic data volumes
+- **Communicate Changes**: Inform team members of significant schema changes
+
+## **7. API Package**
+
+The `packages/api` package defines:
+
+- The endpoints our application exposes
+- The data validation for requests
+- The business logic for handling requests
+- The error handling and responses
+
+Think of it as the receptionist for our application - it receives requests, processes them, and returns appropriate responses.
+
+## **8. DB and API Relationship**
+
+The DB and API packages work together in a clear hierarchy:
+
+1. The DB package defines how data is stored and retrieved
+2. The API package uses the DB package to:
+   - Read data from the database
+   - Write data to the database
+   - Update existing data
+   - Delete data when needed
+
+This separation of concerns allows us to:
+
+- Change how data is stored without affecting how it's accessed
+- Provide a consistent API regardless of database implementation
+- Add validation and business logic between the request and the database
+
+## **9. tRPC Integration**
+
+tRPC is a technology that connects our API to our frontend applications:
+
+- It provides type-safe API calls between server and client
+- It eliminates the need for manual API documentation
+- It offers real-time error checking during development
+
+With tRPC:
+
+1. We define procedures in the API package
+2. These procedures are automatically available in both Next.js and Expo
+3. The frontend gets complete type information about the API
+4. Errors are caught during development rather than in production
+
+## **10. CLI and Scripts**
+
+### **Package.json Scripts**
+
+The scripts in package.json are shortcuts for common tasks:
+
+- `pnpm dev`: Starts the development environment
+- `pnpm build`: Creates production-ready builds
+- `pnpm lint`: Checks code quality
+- `pnpm db:migrate`: Applies database migrations
+
+### **CLI Commands for Database**
+
+Several command-line tools are used for database operations:
+
+- **Supabase CLI**: Manages the Supabase project
+- **Drizzle Kit**: Handles database migrations
+- **pnpm Scripts**: Provides shortcuts for common tasks
+
+Common database commands:
+
+- `pnpm db:studio`: Opens a visual interface to browse the database
+- `pnpm db:migrate`: Applies pending migrations
+- `pnpm db:push`: Updates the database schema directly (for development)
+
+## **11. Script Propagation in Monorepo**
+
+### **How Root Scripts Propagate to Packages and Apps**
+
+In our monorepo structure, the root `package.json` contains scripts that can execute commands across multiple packages and applications. This is managed by Turbo, which orchestrates task execution throughout the monorepo.
+
+### **Turbo Command Structure**
+
+Most scripts in the root `package.json` follow a pattern:
+
+```json
+"script-name": "turbo [command] [options]"
+```
+
+For example:
+
+```json
+"build": "turbo run build",
+"dev": "turbo watch dev",
+"db:push": "turbo -F @acme/db push"
+```
+
+### **Script Propagation Mechanisms**
+
+1. **Blanket Execution (`turbo run command`)**:
+
+   - Runs the specified command in all packages that have that command
+   - Example: `turbo run build` runs the `build` script in every package that has one
+
+2. **Filtered Execution (`turbo -F package command`)**:
+
+   - Runs a command only in specific packages
+   - Example: `turbo -F @acme/db push` runs the `push` script only in the `@acme/db` package
+
+3. **Filtered with Dependencies (`turbo -F package... command`)**:
+
+   - Runs a command in the specified package and all its dependencies
+   - Example: `turbo -F @acme/nextjs... dev` runs `dev` in the Next.js app and all packages it depends on
+
+4. **Workspace Filtering**:
+   - The `workspace:*` reference in dependencies connects packages
+   - Turbo uses these connections to determine execution order
+
+### **Environment Variable Propagation**
+
+When running scripts:
+
+1. **Script Chaining**:
+
+   - The `with-env` script in DB package: `dotenv -e ../../.env.local --`
+   - This loads environment variables before executing commands
+
+2. **Environment Files**:
+   - `.env.local` at the root is the source of truth
+   - Commands run through `with-env` have access to these variables
+
+### **Common Script Patterns**
+
+1. **Development Scripts**:
+
+   ```json
+   "dev": "turbo watch dev"
+   ```
+
+   This watches for changes and runs the `dev` script in all packages in parallel.
+
+2. **Build Scripts**:
+
+   ```json
+   "build": "turbo run build"
+   ```
+
+   This builds all packages in the correct dependency order.
+
+3. **Package-Specific Scripts**:
+   ```json
+   "db:push": "turbo -F @acme/db push"
+   ```
+   This runs a specific command in just one package.
+
+### **Execution Order**
+
+Turbo intelligently handles dependencies:
+
+1. **Dependency-Aware**: Tasks run in the correct order based on the dependency graph
+2. **Parallel Execution**: Independent tasks run in parallel for better performance
+3. **Caching**: Completed tasks are cached to avoid redundant work
+
+### **Adding New Scripts**
+
+When adding a new script that should propagate:
+
+1. Add the script to the root `package.json`
+2. Configure it with the appropriate Turbo command
+3. Ensure target packages have the corresponding script defined
+
+For example, to add a new script that runs tests across all packages:
+
+```json
+// Root package.json
+"test": "turbo run test"
+```
+
+Then ensure each package has its own test script defined:
+
+```json
+// In each package's package.json
+"test": "jest"
+```
+
+## **Conclusion**
+
+This complex structure may seem overwhelming at first, but it provides significant benefits:
+
+- Consistent experience across web and mobile
+- Shared code reducing duplication
+- Type safety preventing common errors
+- Clear separation of concerns
+- Scalable architecture for future growth
+
+As you work with the system, you'll become more familiar with these concepts and how they fit together to create a cohesive application.
