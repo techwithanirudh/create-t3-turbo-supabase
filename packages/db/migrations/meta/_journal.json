@@ -1,12 +1,19 @@
 {
-  "version": "6",
+  "version": "7",
   "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
-      "version": "6",
-      "when": 1715583558178,
-      "tag": "0000_right_karnak",
+      "version": "7",
+      "when": 1742584004390,
+      "tag": "0000_small_fat_cobra",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1742584012851,
+      "tag": "0001_fixed_thunderbolt_ross",
       "breakpoints": true
     }
   ]

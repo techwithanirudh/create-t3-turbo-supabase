@@ -1,9 +1,17 @@
-import { pgSchema, uuid } from "drizzle-orm/pg-core";
+import { pgTable, uuid } from "drizzle-orm/pg-core";
 
-const authSchema = pgSchema("auth");
-
-export const Users = authSchema.table("users", {
-  id: uuid("id").primaryKey(),
-});
+// Reference to Supabase's auth.users table
+export const Users = pgTable(
+  "users",
+  {
+    id: uuid("id").primaryKey(),
+  },
+  (_table) => {
+    return {
+      tableName: "users",
+      schema: "auth",
+    };
+  },
+);
 
 // Used to setup foreign key from profile.id to auth.users table in Supabase

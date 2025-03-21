@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# If no commit message is provided via -m or -F options and not a merge commit
+if [ -z "$2" ] && [ "$3" != "MERGE_MSG" ]; then
+  # User might want to use our interactive commit message helper
+  echo "💡 You can use our interactive commit message helper by running 'pnpm pre-commit' script"
+fi 

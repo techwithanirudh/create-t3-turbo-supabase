@@ -3,14 +3,11 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 
 import { cn } from "@acme/ui";
-import { Toaster } from "@acme/ui/sonner";
-import { ThemeProvider } from "@acme/ui/theme";
-
-import { TRPCReactProvider } from "~/trpc/react";
 
 import "~/app/globals.css";
 
 import { env } from "~/env";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -50,13 +47,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           GeistMono.variable,
         )}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TRPCReactProvider>{props.children}</TRPCReactProvider>
-          {/* <div className="absolute bottom-4 right-4">
-            <ThemeToggle />
-          </div> */}
-          <Toaster />
-        </ThemeProvider>
+        <Providers theme="system">{props.children}</Providers>
       </body>
     </html>
   );

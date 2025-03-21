@@ -9,8 +9,12 @@
     "build": "turbo run build",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo run clean",
-    "db:push": "turbo -F @acme/db push",
     "db:studio": "turbo -F @acme/db studio",
+    "db:check": "turbo -F @acme/db check",
+    "db:migration:generate": "turbo -F @acme/db migration:generate",
+    "db:migration:generate:custom": "turbo -F @acme/db migration:generate:custom",
+    "db:migrate:local": "turbo -F @acme/db migrate:local",
+    "db:migrate:prod": "turbo -F @acme/db migrate:prod",
     "dev": "turbo watch dev",
     "dev:next": "turbo watch dev -F @acme/nextjs...",
     "format": "turbo run format --continue -- --cache --cache-location node_modules/.cache/.prettiercache",
@@ -23,7 +27,7 @@
     "ui-add": "turbo run ui-add",
     "prepare": "husky",
     "pre-commit": "./scripts/pre-commit.sh",
-    "db:migrate": "turbo -F @acme/db migrate"
+    "logs": "./scripts/pre-commit.sh --logs"
   },
   "devDependencies": {
     "@acme/prettier-config": "workspace:*",
@@ -31,6 +35,7 @@
     "dotenv": "^16.4.7",
     "husky": "^9.1.7",
     "prettier": "^3.3.2",
+    "tsx": "^4.19.3",
     "turbo": "^2.0.6",
     "typescript": "^5.5.3"
   },

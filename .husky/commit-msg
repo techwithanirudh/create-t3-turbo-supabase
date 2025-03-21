@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Colors for output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Get the commit message from the temporary file
+commit_msg=$(cat "$1")
+
+# Check that the commit message is not empty
+if [ -z "$(echo "$commit_msg" | head -1 | grep -v '^#')" ]; then
+  echo -e "${RED}ERROR: Empty commit message.${NC}"
+  echo -e "${YELLOW}Please provide a meaningful commit message.${NC}"
+  echo -e "${BLUE}Run pre-commit script for interactive commit message creation${NC}"
+  exit 1
+fi
+
+echo -e "${GREEN}Commit message is valid!${NC}" 

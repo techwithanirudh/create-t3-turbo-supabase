@@ -32,9 +32,21 @@
       "dependsOn": ["^topo", "^build"],
       "outputs": ["node_modules/.cache/tsbuildinfo.json"]
     },
-    "migrate": {
+    "migration:generate": {
       "dependsOn": ["^topo", "^build"],
-      "outputs": ["node_modules/.cache/tsbuildinfo.json"]
+      "outputs": ["migrations/**"]
+    },
+    "migration:generate:custom": {
+      "dependsOn": ["^topo", "^build"],
+      "outputs": ["migrations/**"]
+    },
+    "migrate:local": {
+      "dependsOn": ["^topo", "^build"],
+      "cache": false
+    },
+    "migrate:prod": {
+      "dependsOn": ["^topo", "^build"],
+      "cache": false
     },
     "clean": {
       "cache": false
@@ -42,13 +54,14 @@
     "//#clean": {
       "cache": false
     },
-    "push": {
-      "cache": false,
-      "interactive": true
-    },
     "studio": {
       "cache": false,
       "persistent": true
+    },
+    "check": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["^topo", "^build"]
     },
     "ui-add": {
       "cache": false,

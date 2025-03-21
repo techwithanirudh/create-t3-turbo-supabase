@@ -31,8 +31,8 @@
     "lucide-react": "^0.364.0",
     "next": "^14.2.4",
     "next-safe-action": "^6.2.0",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "superjson": "2.2.1",
     "tus-js-client": "^4.1.0",
     "zod": "^3.23.8"

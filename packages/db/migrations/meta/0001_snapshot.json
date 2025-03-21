@@ -1,6 +1,6 @@
 {
-  "id": "e6866e29-ebaf-4e60-8951-66e56eb2a371",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "92a21cfd-2f1e-49a8-bf3c-8e1d67a530f1",
+  "prevId": "e6866e29-ebaf-4e60-8951-66e56eb2a371",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -54,11 +54,11 @@
         "t3turbo_profile_id_users_id_fk": {
           "name": "t3turbo_profile_id_users_id_fk",
           "tableFrom": "t3turbo_profile",
-          "tableTo": "users",
           "columnsFrom": ["id"],
+          "tableTo": "users",
           "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -112,11 +112,11 @@
         "t3turbo_post_author_id_t3turbo_profile_id_fk": {
           "name": "t3turbo_post_author_id_t3turbo_profile_id_fk",
           "tableFrom": "t3turbo_post",
-          "tableTo": "t3turbo_profile",
           "columnsFrom": ["author_id"],
+          "tableTo": "t3turbo_profile",
           "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
