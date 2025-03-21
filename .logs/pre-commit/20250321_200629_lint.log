@@ -1,0 +1,74 @@
+
+> create-turbo-stack@ lint /Users/kaszek/Desktop/create-turbo-stack
+> turbo run lint --continue -- --cache --cache-location node_modules/.cache/.eslintcache
+
+• Packages in scope: @acme/api, @acme/db, @acme/eslint-config, @acme/expo, @acme/github, @acme/nextjs, @acme/prettier-config, @acme/tailwind-config, @acme/tsconfig, @acme/ui, @acme/validators
+• Running lint in 11 packages
+• Remote caching disabled
+@acme/db:build: cache hit, replaying logs 1b596b028fab7ae2
+@acme/validators:build: cache hit, replaying logs 8ad7e90ec50492f2
+@acme/db:build: 
+@acme/db:build: > @acme/db@0.1.0 build /Users/kaszek/Desktop/create-turbo-stack/packages/db
+@acme/db:build: > tsc
+@acme/db:build: 
+@acme/validators:build: 
+@acme/validators:build: > @acme/validators@0.1.0 build /Users/kaszek/Desktop/create-turbo-stack/packages/validators
+@acme/validators:build: > tsc
+@acme/validators:build: 
+@acme/db:lint: cache hit, replaying logs 2b541b9460c181e0
+@acme/db:lint: 
+@acme/db:lint: > @acme/db@0.1.0 lint /Users/kaszek/Desktop/create-turbo-stack/packages/db
+@acme/db:lint: > eslint "--cache" "--cache-location" "node_modules/.cache/.eslintcache"
+@acme/db:lint: 
+@acme/tailwind-config:lint: cache hit, replaying logs eecdf781f41a0eff
+@acme/tailwind-config:lint: 
+@acme/tailwind-config:lint: > @acme/tailwind-config@0.1.0 lint /Users/kaszek/Desktop/create-turbo-stack/tooling/tailwind
+@acme/tailwind-config:lint: > eslint "--cache" "--cache-location" "node_modules/.cache/.eslintcache"
+@acme/tailwind-config:lint: 
+@acme/validators:lint: cache hit, replaying logs 6dcef12816db55dc
+@acme/validators:lint: 
+@acme/validators:lint: > @acme/validators@0.1.0 lint /Users/kaszek/Desktop/create-turbo-stack/packages/validators
+@acme/validators:lint: > eslint "--cache" "--cache-location" "node_modules/.cache/.eslintcache"
+@acme/validators:lint: 
+@acme/api:lint: cache hit, replaying logs c088a92bf023e1e6
+@acme/api:lint: 
+@acme/api:lint: > @acme/api@0.1.0 lint /Users/kaszek/Desktop/create-turbo-stack/packages/api
+@acme/api:lint: > eslint "--cache" "--cache-location" "node_modules/.cache/.eslintcache"
+@acme/api:lint: 
+@acme/api:build: cache hit, replaying logs df199a2bab42a2be
+@acme/api:build: 
+@acme/api:build: > @acme/api@0.1.0 build /Users/kaszek/Desktop/create-turbo-stack/packages/api
+@acme/api:build: > tsc
+@acme/api:build: 
+@acme/ui:lint: cache hit, replaying logs b4144a104e264ef5
+@acme/ui:lint: 
+@acme/ui:lint: > @acme/ui@0.1.0 lint /Users/kaszek/Desktop/create-turbo-stack/packages/ui
+@acme/ui:lint: > eslint "--cache" "--cache-location" "node_modules/.cache/.eslintcache"
+@acme/ui:lint: 
+@acme/nextjs:lint: cache miss, executing e9f4ee8912279a08
+@acme/expo:lint: cache hit, replaying logs e9b4c1538a33e4c1
+@acme/expo:lint: 
+@acme/expo:lint: > @acme/expo@0.1.0 lint /Users/kaszek/Desktop/create-turbo-stack/apps/expo
+@acme/expo:lint: > eslint "--cache" "--cache-location" "node_modules/.cache/.eslintcache"
+@acme/expo:lint: 
+@acme/nextjs:lint: 
+@acme/nextjs:lint: > @acme/nextjs@0.1.0 lint /Users/kaszek/Desktop/create-turbo-stack/apps/nextjs
+@acme/nextjs:lint: > eslint "--cache" "--cache-location" "node_modules/.cache/.eslintcache"
+@acme/nextjs:lint: 
+@acme/nextjs:lint: 
+@acme/nextjs:lint: /Users/kaszek/Desktop/create-turbo-stack/apps/nextjs/src/app/_components/landing/hero/CopyButton.tsx
+@acme/nextjs:lint:   9:9  error  Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+@acme/nextjs:lint: 
+@acme/nextjs:lint: ✖ 1 problem (1 error, 0 warnings)
+@acme/nextjs:lint: 
+@acme/nextjs:lint:  ELIFECYCLE  Command failed with exit code 1.
+@acme/nextjs:lint: command finished with error, but continuing...
+@acme/nextjs#lint: command (/Users/kaszek/Desktop/create-turbo-stack/apps/nextjs) /Users/kaszek/.nvm/versions/node/v22.12.0/bin/pnpm run lint --cache --cache-location node_modules/.cache/.eslintcache exited (1)
+
+ Tasks:    9 successful, 10 total
+Cached:    9 cached, 10 total
+  Time:    2.756s 
+Failed:    @acme/nextjs#lint
+
+ ERROR  run failed: command  exited (1)
+ ELIFECYCLE  Command failed with exit code 1.

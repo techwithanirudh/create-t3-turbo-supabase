@@ -1,4 +1,4 @@
-import { FAQ, Features, Footer, Header, Hero } from "./_components/landing";
+import { FAQ, Features, Header, Hero } from "./_components/landing";
 
 export default function HomePage() {
   return (
@@ -9,7 +9,7 @@ export default function HomePage() {
         <Features />
         <FAQ />
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
